@@ -1,9 +1,6 @@
 FROM weigao/java8
 MAINTAINER Wei Gao<wei@gaofamily.org>
 
-# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN addgroup -S -g 999 jetty && adduser -S -G jetty -u 999 jetty
-
 ENV JETTY_HOME /usr/local/jetty
 RUN mkdir -p "$JETTY_HOME"
 WORKDIR $JETTY_HOME
@@ -39,12 +36,11 @@ RUN apk --update add coreutils \
     && set -xe \
     && java -jar "$JETTY_HOME/start.jar" --add-to-startd="$modules,setuid" \
     && mkdir -p "$JETTY_RUN" "$TMPDIR" \
-    && chown -R jetty:jetty "$JETTY_RUN" "$TMPDIR" "$JETTY_BASE" \
     && apk del coreutils \
     && rm /var/cache/apk/* \
     && sed -i '/\s*<!-- Uncomment to enable handling of X-Forwarded- style headers/ {N; N; N; N; /<!-- Uncomment to enable handling of X-Forwarded- style headers.*-->/ { s/<!-- Uncomment to enable handling of X-Forwarded- style headers\(.*\)-->/\1/; P; D; }}' $JETTY_HOME/etc/jetty.xml
 
-VOLUME [ "/run/jetty", "/tmp/jetty", "/var/lib/jetty/webapps" ]
+VOLUME [ "/run/jetty", "/tmp/jetty" ]
 
 EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]
