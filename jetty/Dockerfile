@@ -2,7 +2,7 @@ FROM weigao/java8
 MAINTAINER Wei Gao<wei@gaofamily.org>
 
 ENV JETTY_HOME /usr/local/jetty
-RUN mkdir -p "$JETTY_HOME"
+RUN addgroup -S jetty && adduser -S -G jetty jetty && mkdir -p "$JETTY_HOME"
 WORKDIR $JETTY_HOME
 
 COPY docker-entrypoint.sh /
@@ -20,7 +20,7 @@ RUN apk --update add curl tar \
     && chmod +x /docker-entrypoint.sh \
     && apk del curl tar \
     && rm /var/cache/apk/* \
-    && echo 'files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
+    && echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
 
 ENV JETTY_BASE /var/lib/jetty
 RUN mkdir -p "$JETTY_BASE"
@@ -36,6 +36,7 @@ RUN apk --update add coreutils \
     && set -xe \
     && java -jar "$JETTY_HOME/start.jar" --add-to-startd="$modules,setuid" \
     && mkdir -p "$JETTY_RUN" "$TMPDIR" \
+    && chown -R jetty:jetty "$JETTY_RUN" "$TMPDIR" "$JETTY_BASE" \
     && apk del coreutils \
     && rm /var/cache/apk/* \
     && sed -i '/\s*<!-- Uncomment to enable handling of X-Forwarded- style headers/ {N; N; N; N; /<!-- Uncomment to enable handling of X-Forwarded- style headers.*-->/ { s/<!-- Uncomment to enable handling of X-Forwarded- style headers\(.*\)-->/\1/; P; D; }}' $JETTY_HOME/etc/jetty.xml

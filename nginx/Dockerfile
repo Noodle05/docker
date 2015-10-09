@@ -4,7 +4,7 @@ MAINTAINER Wei Gao<wei@gaofamily.org
 
 ENV NGINX_VERSION nginx-1.8.0
 
-RUN addgroup -S -g 999 nginx && adduser -S -G nginx -u 999 nginx && \
+RUN addgroup -S nginx && adduser -S -G nginx nginx && \
     apk --update add openssl openssl-dev pcre pcre-dev zlib zlib-dev \
     linux-headers wget build-base && \
     mkdir -p /tmp/src && \
@@ -48,13 +48,17 @@ RUN addgroup -S -g 999 nginx && adduser -S -G nginx -u 999 nginx && \
     apk del build-base openssl-dev pcre-dev zlib-dev linux-headers wget && \
     rm -rf /tmp/src && \
     rm -rf /var/cache/apk/* && \
-    mkdir -p /var/cache/nginx && \
+    rm -f /etc/nginx/*.default && \
+    mkdir -p /etc/nginx/conf.d && \
     mkdir -p /var/lib/nginx/tmp && \
-    chown nginx:nginx /var/cache/nginx /var/lib/nginx && \
+    chown nginx:nginx /var/lib/nginx && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
 
-VOLUME [ "/usr/share/nginx/html", "/var/log/nginx", "/var/run/nginx", "/var/lib/nginx" ]
+COPY nginx.conf /etc/nginx/
+COPY default.conf /etc/nginx/conf.d/
+
+VOLUME [ "/var/run/nginx", "/var/lib/nginx", "/etc/nginx" ]
 
 WORKDIR /usr/share/nginx
 
