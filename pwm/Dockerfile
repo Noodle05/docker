@@ -1,21 +1,22 @@
-FROM weigao/jetty
+FROM jetty:9-jre8-alpine
 MAINTAINER Wei Gao<wei@gaofamily.org>
 
-RUN apk --update add curl \
-    && mkdir -p /tmp/pwm \
-    && curl -SL "https://googledrive.com/host/0B3oHdiTrftrGV3ZrMi1LUzVCY1U/pwm_v1.7.1.zip" -o /tmp/pwm/pwm_v1.7.1.zip \
-    && unzip -d /tmp/pwm /tmp/pwm/pwm_v1.7.1.zip && rm -f /tmp/pwm/pwm_v1.7.1.zip \
-    && apk del curl \
-    && rm /var/cache/apk/* \
-    && mkdir -p /var/lib/jetty/webapps/ROOT \
-    && unzip -d /var/lib/jetty/webapps/ROOT /tmp/pwm/pwm.war \
-    && rm -fr /tmp/pwm/* \
-    && mkdir -p /var/lib/pwm/config \
-    && mkdir -p /var/lib/pwm/LocalDB \
-    && mkdir -p /var/lib/pwm/logs \
-    && chown -R jetty:jetty /var/lib/pwm \
-    && sed -i 's/<param-value>PwmConfiguration.xml<\/param-value>/<param-value>\/var\/lib\/pwm\/config\/PwmConfiguration.xml<\/param-value>/g' /var/lib/jetty/webapps/ROOT/WEB-INF/web.xml \
-    && ln -snf /var/lib/pwm/LocalDB /var/lib/jetty/webapps/ROOT/WEB-INF \
-    && ln -snf /var/lib/pwm/logs /var/lib/jetty/webapps/ROOT/WEB-INF
+RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=http-forwarded && \
+    apk add --no-cache --virtual .build-deps curl fastjar && \
+    mkdir $JETTY_BASE/webapps/ROOT/ && \
+    curl -o /root/pwm-bundle.zip -L "http://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2016-06-02T15%3A59%3A59Z-pwm-bundle.zip" && \
+    unzip -d /root /root/pwm-bundle.zip && \
+    cd $JETTY_BASE/webapps/ROOT/ && \
+    fastjar -xf /root/pwm.war && \
+    rm -fr /root/* && \
+    mv $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig-sample.xml $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig.xml && \
+    curl -o $JETTY_BASE/webapps/ROOT/WEB-INF/lib/postgresql-9.4-1208.jar -L "https://jdbc.postgresql.org/download/postgresql-9.4.1208.jar" && \
+    sed -i 's/^# jetty.deploy.scanInterval=1$/jetty.deploy.scanInterval=0/g' $JETTY_BASE/start.d/deploy.ini && \
+    sed -i 's/^# \(jetty.httpConfig.forwarded.*\)$/\1/g' $JETTY_BASE/start.d/http-forwarded.ini && \
+    apk del .build-deps && \
+    rm -fr .bulid-deps && \
+    rm -fr /tmp/hsperfdata_root
 
-VOLUME [ "/var/lib/pwm" ]
+ENV PWM_APPLICATIONPATH=/config
+
+VOLUME [ "/config" ]

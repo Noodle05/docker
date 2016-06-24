@@ -20,7 +20,7 @@ COPY gerrit-start.sh /
 
 # Add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN adduser -D -h "$GERRIT_HOME" -S $GERRIT_USER && \
-    apk add --no-cache git-gitweb su-exec && \
+    apk add --no-cache git-gitweb su-exec perl-cgi && \
     apk add --no-cache --virtual .build-deps curl && \
     mkdir /docker-entrypoint-init.d && \
     curl -L https://gerrit-releases.storage.googleapis.com/gerrit-${GERRIT_VERSION}.war -o $GERRIT_WAR && \
