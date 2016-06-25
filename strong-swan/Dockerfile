@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.4
 MAINTAINER Wei Gao<wei@gaofamily.org>
 
 ARG STRONGSWAN_VERSION=5.4.0
