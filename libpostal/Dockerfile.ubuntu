@@ -1,9 +1,9 @@
 FROM ubuntu:xenial
 MAINTAINER Wei Gao<wei@gaofmaily.org>
 
-RUN apt-get -y update \
- && apt-get -y upgrade \
- && apt-get install -y --no-install-recommends libsnappy1v5 curl ca-certificates \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libsnappy1v5 curl ca-certificates \
             libsnappy-dev autoconf automake libtool pkg-config git \
  && mkdir /data \
  && cd /usr/local/src/ \
@@ -15,9 +15,9 @@ RUN apt-get -y update \
  && make install \
  && cd / \
  && rm -fr /usr/local/src/libpostal \
- && apt-get remove -y --purge --auto-remove curl ca-certificates libsnappy-dev \
+ && DEBIAN_FRONTEND=noninteractive apt-get remove -y --purge --auto-remove curl ca-certificates libsnappy-dev \
             autoconf automake libtool pkg-config git \
- && apt-get clean all \
+ && DEBIAN_FRONTEND=noninteractive apt-get clean all \
  && ldconfig \
  && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /core
 
