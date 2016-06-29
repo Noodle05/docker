@@ -1,0 +1,22 @@
+FROM alpine:3.4
+
+MAINTAINER Wei Gao<wei@gaofmaily.org>
+
+RUN apk add --no-cache snappy \
+ && apk add --no-cache --virtual .build-deps curl snappy-dev git autoconf automake make gcc libtool libc-dev coreutils \
+ && mkdir /data \
+ && mkdir -p /tmp/src \
+ && cd /tmp/src \
+ && git clone https://github.com/openvenues/libpostal.git \
+ && cd libpostal \
+ && echo "ACLOCAL_AMFLAGS = -I m4" >> Makefile.am \
+ && echo "AC_CONFIG_MACRO_DIR([m4])" >> configure.ac \
+ && mkdir m4 \
+ && ./bootstrap.sh \
+ && ./configure --datadir=/data \
+ && make -j \
+ && make install \
+ && cd / \
+ && rm -fr /tmp/src \
+ && apk del .build-deps \
+ && rm -fr .build-deps

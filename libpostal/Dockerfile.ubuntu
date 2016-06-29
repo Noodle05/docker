@@ -1,0 +1,21 @@
+FROM ubuntu:xenial
+MAINTAINER Wei Gao<wei@gaofmaily.org>
+
+RUN apt-get -y update \
+ && apt-get -y upgrade \
+ && apt-get install -y libsnappy1v5 curl libsnappy-dev autoconf automake libtool pkg-config git \
+ && mkdir /data \
+ && cd /usr/local/src/ \
+ && git clone https://github.com/openvenues/libpostal.git \
+ && cd libpostal \
+ && ./bootstrap.sh \
+ && ./configure --datadir=/data \
+ && make -j \
+ && make install \
+ && cd / \
+ && rm -fr /usr/local/src/libpostal \
+ && apt-get purge -y curl libsnappy-dev autoconf automake libtool pkg-config git \
+ && apt-get autoremove -y --purge \
+ && apt-get clean -y \
+ && ldconfig \
+ && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
