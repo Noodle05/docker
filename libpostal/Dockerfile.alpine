@@ -13,12 +13,11 @@ RUN apk add --no-cache snappy \
  && echo "AC_CONFIG_MACRO_DIR([m4])" >> configure.ac \
  && mkdir m4 \
  && ./bootstrap.sh \
- && ./configure --datadir=/data \
+ && ./configure --prefix=/usr --datadir=/data \
  && make -j \
  && make install \
  && cd / \
- && rm -fr /tmp/src \
  && apk del .build-deps \
- && rm -fr .build-deps
+ && rm -fr .build-deps /tmp/src /root/.ash_history
 
 VOLUME [ "/data" ]
