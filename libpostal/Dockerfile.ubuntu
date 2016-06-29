@@ -19,6 +19,6 @@ RUN apt-get -y update \
             autoconf automake libtool pkg-config git \
  && apt-get clean all \
  && ldconfig \
- && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/* /core
 
 VOLUME [ "/data" ]
