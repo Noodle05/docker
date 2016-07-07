@@ -3,7 +3,7 @@ MAINTAINER Wei Gao<wei@gaofmaily.org>
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
  && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libsnappy1v5 ca-certificates \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libsnappy1v5 curl ca-certificates \
             libsnappy-dev autoconf automake libtool pkg-config git \
  && mkdir /data \
  && cd /usr/local/src/ \
