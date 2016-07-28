@@ -10,7 +10,7 @@ do
     echo 0 > $each/send_redirects
 done
 
-if [ ! -f /etc/ipsec.secret ]; then
+if [ ! -f /etc/ipsec.secrets ]; then
     if [ "$VPN_PASSWORD" = "password" ] || [ "$VPN_PASSWORD" = "" ]; then
         # Generate a random password
         P1=`cat /dev/urandom | tr -cd abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 | head -c 3`
@@ -45,21 +45,6 @@ if [ ! -f /etc/ipsec.secret ]; then
 $VPN_USER : EAP "$VPN_PASSWORD"
 $VPN_USER : XAUTH "$VPN_PASSWORD"
 EOF
-fi
-
-if [ -f "/conf/ipsec.secrets" ]; then
-    echo "Overwriting standard /etc/ipsec.secrets with /conf/ipsec.secrets"
-    cp -f /conf/ipsec.secrets /etc/ipsec.secrets
-fi
-
-if [ -f "/conf/ipsec.conf" ]; then
-    echo "Overwriting standard /etc/ipsec.conf with /conf/ipsec.conf"
-    cp -f /conf/ipsec.conf /etc/ipsec.conf
-fi
-
-if [ -f "/conf/strongswan.conf" ]; then
-    echo "Overwriting standard /etc/strongswan.conf with /conf/strongswan.conf"
-    cp -f /conf/strongswan.conf /etc/strongswan.conf
 fi
 
 ipsec start --nofork\
