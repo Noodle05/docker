@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Stop docker may leak /var/run/starter.charon.pid cause strongswan cannot start again.
+# Delete it here
+rm -f /var/run/starter.charon.pid
+
 sysctl -w net.ipv4.conf.all.rp_filter=2
 
 iptables --table nat --append POSTROUTING --jump MASQUERADE
