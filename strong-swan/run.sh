@@ -47,4 +47,4 @@ $VPN_USER : XAUTH "$VPN_PASSWORD"
 EOF
 fi
 
-ipsec start --nofork\
+exec ipsec start --nofork\
