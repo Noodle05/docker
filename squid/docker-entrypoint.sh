@@ -1,5 +1,8 @@
 #!/bin/sh
 set -e
+
+rm -f /var/run/squid.pid
+
 if [ ! "$(ls -A /var/cache/squid)" ]; then
     /usr/sbin/squid -z
 fi
