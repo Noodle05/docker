@@ -10,4 +10,4 @@ fi
 chown squid.squid /dev/stdout
 chown squid.squid /dev/stderr
 
-exec /usr/sbin/squid -NC
+exec /usr/sbin/squid -NCd1
