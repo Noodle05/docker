@@ -68,6 +68,12 @@ if [ "$1" = "/gerrit-start.sh" ]; then
     [ -z "${DB_ENV_MYSQL_PASSWORD}" ] || set_secure_config database.password "${DB_ENV_MYSQL_PASSWORD}"
   fi
 
+  #Section auth
+  [ -z "${AUTH_TYPE}" ]           || set_gerrit_config auth.type "${AUTH_TYPE}"
+  [ -z "${AUTH_HTTP_HEADER}" ]    || set_gerrit_config auth.httpHeader "${AUTH_HTTP_HEADER}"
+  [ -z "${AUTH_EMAIL_FORMAT}" ]   || set_gerrit_config auth.emailFormat "${AUTH_EMAIL_FORMAT}"
+  [ -z "${AUTH_GIT_BASIC_AUTH}" ] || set_gerrit_config auth.gitBasicAuth "${AUTH_GIT_BASIC_AUTH}"
+
   #Section ldap
   if [ "${AUTH_TYPE}" = 'LDAP' ] || [ "${AUTH_TYPE}" = 'LDAP_BIND' ] ; then
     set_gerrit_config auth.type "${AUTH_TYPE}"
@@ -116,11 +122,6 @@ if [ "$1" = "/gerrit-start.sh" ]; then
     [ -z "${OAUTH_GITHUB_CLIENT_SECRET}" ]     || set_gerrit_config plugin.gerrit-oauth-provider-github-oauth.client-secret "${OAUTH_GITHUB_CLIENT_SECRET}"
   fi
 
-  # section DEVELOPMENT_BECOME_ANY_ACCOUNT
-  if [ "${AUTH_TYPE}" = 'DEVELOPMENT_BECOME_ANY_ACCOUNT' ]  ; then
-    set_gerrit_config auth.type "${AUTH_TYPE}"
-  fi
-
   # section container
   [ -z "${JAVA_HEAPLIMIT}" ] || set_gerrit_config container.heapLimit "${JAVA_HEAPLIMIT}"
   [ -z "${JAVA_OPTIONS}" ]   || set_gerrit_config container.javaOptions "${JAVA_OPTIONS}"
@@ -155,6 +156,9 @@ if [ "$1" = "/gerrit-start.sh" ]; then
 
   #Section httpd
   [ -z "${HTTPD_LISTENURL}" ] || set_gerrit_config httpd.listenUrl "${HTTPD_LISTENURL}"
+
+  #Section gitweb
+  set_gerrit_config gitweb.cgi "/usr/share/gitweb/gitweb.cgi"
 
   echo "Upgrading gerrit..."
   su-exec ${GERRIT_USER} java -jar "${GERRIT_WAR}" init --batch -d "${GERRIT_SITE}" ${GERRIT_INIT_ARGS}
