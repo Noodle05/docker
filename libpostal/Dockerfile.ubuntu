@@ -15,7 +15,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
  && echo "AC_CONFIG_MACRO_DIR([m4])" >> configure.ac \
  && mkdir m4 \
 ## Don't download data file now.
- && sed -i -e "s/\(\s*\.\/libpostal_data\s*download\s*all\s*\$(datadir)\/libpostal\)/#\1/g" src/Makefile.am \
+# && sed -i -e "s/\(\s*\.\/libpostal_data\s*download\s*all\s*\$(datadir)\/libpostal\)/#\1/g" src/Makefile.am \
+ && sed -i -e 's/\(\s*.*\/libpostal_data\s*download\s*all\s*\$(datadir)\/libpostal\)/#\1/g' src/Makefile.am \
  && ./bootstrap.sh \
  && ./configure --prefix=/usr --datadir=/data \
  && make -j \
