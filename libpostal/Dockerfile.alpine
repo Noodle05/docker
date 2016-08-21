@@ -2,8 +2,8 @@ FROM alpine:3.4
 
 MAINTAINER Wei Gao<wei@gaofmaily.org>
 
-RUN apk add --no-cache snappy curl bash findutils tar \
- && apk add --no-cache --virtual .build-deps snappy-dev git autoconf automake make gcc libtool libc-dev coreutils \
+RUN apk add --no-cache snappy curl bash findutils tar coreutils \
+ && apk add --no-cache --virtual .build-deps snappy-dev git autoconf automake make gcc libtool libc-dev \
  && mkdir /data \
  && mkdir -p /tmp/src \
  && cd /tmp/src \
