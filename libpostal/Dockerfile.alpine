@@ -2,9 +2,10 @@ FROM alpine:3.4
 
 MAINTAINER Wei Gao<wei@gaofmaily.org>
 
+ADD docker-entrypoint.sh /
+
 RUN apk add --no-cache snappy curl bash findutils tar coreutils \
  && apk add --no-cache --virtual .build-deps snappy-dev git autoconf automake make gcc libtool libc-dev \
- && mkdir /data \
  && mkdir -p /tmp/src \
  && cd /tmp/src \
  && git clone https://github.com/openvenues/libpostal.git \
@@ -22,3 +23,5 @@ RUN apk add --no-cache snappy curl bash findutils tar coreutils \
  && rm -fr .build-deps /tmp/src /root/.ash_history
 
 VOLUME [ "/data" ]
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]

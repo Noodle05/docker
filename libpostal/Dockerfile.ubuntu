@@ -1,11 +1,12 @@
 FROM ubuntu:xenial
 MAINTAINER Wei Gao<wei@gaofmaily.org>
 
+ADD docker-entrypoint.sh /
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
  && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libsnappy1v5 curl ca-certificates \
             libsnappy-dev autoconf automake libtool pkg-config git \
- && mkdir /data \
  && cd /usr/local/src/ \
  && git clone https://github.com/openvenues/libpostal.git \
  && cd libpostal \
@@ -28,3 +29,5 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
  && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 VOLUME [ "/data" ]
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
