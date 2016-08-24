@@ -8,7 +8,7 @@ RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=http-forwarded \
  && apk add --no-cache --virtual .build-deps curl fastjar tar \
  && mkdir $JETTY_BASE/webapps/ROOT/ \
  && cd /root \
- && curl -L "http://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2016-08-10T18%3A56%3A01Z-pwm-bundle.zip" \
+ && curl -L "http://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2016-08-22T16%3A07%3A44Z-pwm-bundle.zip" \
   | fastjar -xf /dev/stdin \
  && cd $JETTY_BASE/webapps/ROOT/ \
  && fastjar -xf /root/pwm.war \
