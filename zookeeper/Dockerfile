@@ -10,12 +10,11 @@ ENV ZK_ID=-1
 ENV ZK_SERVER_LIST=""
 
 RUN apk add --no-cache bash \
- && apk add --no-cache --virtual .build-deps curl \
- && mkdir /opt \
- && curl -L $MIRROR/zookeeper/zookeeper-$VERSION/zookeeper-$VERSION.tar.gz | tar -xzf - -C /opt \
- && mv /opt/zookeeper-$VERSION /opt/zookeeper \
+ && apk add --no-cache --virtual .build-deps curl libarchive-tools \
+ && mkdir -p /opt/zookeeper \
+ && curl -s -L $MIRROR/zookeeper/zookeeper-$VERSION/zookeeper-$VERSION.tar.gz \
+  | bsdtar --exclude "zookeeper*/contrib" --exclude "zookeeper*/dist-maven" --exclude "zookeeper*/recipes" --exclude "zookeeper*/src" --exclude "zookeeper*/docs" --exclude "zookeeper*/ivy*" --exclude "zookeeper*/build.xml" --strip-components 1 -C /opt/zookeeper -xf - \
  && mkdir -p /var/lib/zookeeper \
- && rm -fr /opt/zookeeper/contrib /opt/zookeeper/docs /opt/zookeeper/recipes /opt/zookeeper/src /opt/zookeeper/dist-maven /opt/zookeeper/build.xml /opt/zookeeper/ivy.xml /opt/zookeeper/ivysettings.xml \
  && apk del .build-deps \
  && rm -fr .build-deps
 
