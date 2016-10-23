@@ -8,7 +8,7 @@ ARG MAVEN_CENTRAL_URL=http://central.maven.org/maven2
 RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=http-forwarded \
  && apk add --no-cache --virtual .build-deps curl libarchive-tools \
  && mkdir $JETTY_BASE/webapps/ROOT/ \
- && curl -s -L "http://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2016-09-21T22%3A48%3A53Z-pwm-bundle.zip" \
+ && curl -s -L "http://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2016-10-20T21:29:42Z-pwm-bundle.zip" \
   | bsdtar --include "pwm*.war" -xOf - \
   | bsdtar -C $JETTY_BASE/webapps/ROOT -xf - \
  && mv $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig-sample.xml $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig.xml \
