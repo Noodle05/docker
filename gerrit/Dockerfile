@@ -44,4 +44,4 @@ ENTRYPOINT ["/gerrit-entrypoint.sh"]
 
 EXPOSE 8080 29418
 
-CMD ["/gerrit-start.sh"]
+CMD ["start"]
