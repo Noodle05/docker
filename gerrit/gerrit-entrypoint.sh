@@ -174,7 +174,7 @@ if [ "$1" = "start" ]; then
     chown -R ${GERRIT_USER} "${GERRIT_CACHE_DIR}"
     
     # clean up cache
-    rm -fr "${GERRIT_CACHE_DIR}/"
+    rm -fr "${GERRIT_CACHE_DIR}/*"
 
     if ! ls -1A "$GERRIT_SITE" | grep -q .
     then
