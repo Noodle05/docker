@@ -172,7 +172,10 @@ if [ "$1" = "start" ]; then
     # This obviously ensures the permissions are set correctly for when gerrit starts.
     chown -R ${GERRIT_USER} "${GERRIT_SITE}"
     chown -R ${GERRIT_USER} "${GERRIT_CACHE_DIR}"
-  
+    
+    # clean up cache
+    rm -fr "${GERRIT_CACHE_DIR}/"
+
     if ! ls -1A "$GERRIT_SITE" | grep -q .
     then
         echo "First time initialize gerrit..."
