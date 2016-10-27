@@ -38,7 +38,7 @@ RUN adduser -D -h "$GERRIT_HOME" -S $GERRIT_USER && \
 
 #Gerrit site directory is a volume, so configuration and repositories
 #can be persisted and survive image upgrades.
-VOLUME [ $GERRIT_SITE $GERRIT_CACHE_DIR ]
+VOLUME $GERRIT_SITE $GERRIT_CACHE_DIR
 
 ENTRYPOINT ["/gerrit-entrypoint.sh"]
 
