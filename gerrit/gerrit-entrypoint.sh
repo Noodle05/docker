@@ -15,8 +15,11 @@ if [ "$1" = "/gerrit-start.sh" ]; then
   # If you're mounting ${GERRIT_SITE} to your host, you this will default to root.
   # This obviously ensures the permissions are set correctly for when gerrit starts.
   chown -R ${GERRIT_USER} "${GERRIT_SITE}"
+  chown -R ${GERRIT_USER} "${GERRIT_CACHE_DIR}"
 
-  if [ -z "$(ls -A "$GERRIT_SITE")" ]; then
+  # if [ "x$(ls -A "$GERRIT_SITE")" = "x" ]; then
+  if ! ls -1A "$GERRIT_SITE" | grep -q .
+  then
     echo "First time initialize gerrit..."
     su-exec ${GERRIT_USER} java -jar "${GERRIT_WAR}" init --batch --no-auto-start -d "${GERRIT_SITE}" ${GERRIT_INIT_ARGS}
     #All git repositories must be removed when database is set as postgres or mysql
@@ -46,89 +49,89 @@ if [ "$1" = "/gerrit-start.sh" ]; then
   #Customize gerrit.config
 
   #Section gerrit
-  [ -z "${WEBURL}" ] || set_gerrit_config gerrit.canonicalWebUrl "${WEBURL}"
+  [ "x${WEBURL}" = "x" ] || set_gerrit_config gerrit.canonicalWebUrl "${WEBURL}"
 
   #Section database
   if [ "${DATABASE_TYPE}" = 'postgresql' ]; then
     set_gerrit_config database.type "${DATABASE_TYPE}"
-    [ -z "${DB_PORT_5432_TCP_ADDR}" ]    || set_gerrit_config database.hostname "${DB_PORT_5432_TCP_ADDR}"
-    [ -z "${DB_PORT_5432_TCP_PORT}" ]    || set_gerrit_config database.port "${DB_PORT_5432_TCP_PORT}"
-    [ -z "${DB_ENV_POSTGRES_DB}" ]       || set_gerrit_config database.database "${DB_ENV_POSTGRES_DB}"
-    [ -z "${DB_ENV_POSTGRES_USER}" ]     || set_gerrit_config database.username "${DB_ENV_POSTGRES_USER}"
-    [ -z "${DB_ENV_POSTGRES_PASSWORD}" ] || set_secure_config database.password "${DB_ENV_POSTGRES_PASSWORD}"
+    [ "x${DB_PORT_5432_TCP_ADDR}" = "x" ]    || set_gerrit_config database.hostname "${DB_PORT_5432_TCP_ADDR}"
+    [ "x${DB_PORT_5432_TCP_PORT}" = "x" ]    || set_gerrit_config database.port "${DB_PORT_5432_TCP_PORT}"
+    [ "x${DB_ENV_POSTGRES_DB}" = "x" ]       || set_gerrit_config database.database "${DB_ENV_POSTGRES_DB}"
+    [ "x${DB_ENV_POSTGRES_USER}" = "x" ]     || set_gerrit_config database.username "${DB_ENV_POSTGRES_USER}"
+    [ "x${DB_ENV_POSTGRES_PASSWORD}" = "x" ] || set_secure_config database.password "${DB_ENV_POSTGRES_PASSWORD}"
   fi
 
   #Section database
   if [ "${DATABASE_TYPE}" = 'mysql' ]; then
     set_gerrit_config database.type "${DATABASE_TYPE}"
-    [ -z "${DB_PORT_3306_TCP_ADDR}" ] || set_gerrit_config database.hostname "${DB_PORT_3306_TCP_ADDR}"
-    [ -z "${DB_PORT_3306_TCP_PORT}" ] || set_gerrit_config database.port "${DB_PORT_3306_TCP_PORT}"
-    [ -z "${DB_ENV_MYSQL_DB}" ]       || set_gerrit_config database.database "${DB_ENV_MYSQL_DB}"
-    [ -z "${DB_ENV_MYSQL_USER}" ]     || set_gerrit_config database.username "${DB_ENV_MYSQL_USER}"
-    [ -z "${DB_ENV_MYSQL_PASSWORD}" ] || set_secure_config database.password "${DB_ENV_MYSQL_PASSWORD}"
+    [ "x${DB_PORT_3306_TCP_ADDR}" = "x" ] || set_gerrit_config database.hostname "${DB_PORT_3306_TCP_ADDR}"
+    [ "x${DB_PORT_3306_TCP_PORT}" = "x" ] || set_gerrit_config database.port "${DB_PORT_3306_TCP_PORT}"
+    [ "x${DB_ENV_MYSQL_DB}" = "x" ]       || set_gerrit_config database.database "${DB_ENV_MYSQL_DB}"
+    [ "x${DB_ENV_MYSQL_USER}" = "x" ]     || set_gerrit_config database.username "${DB_ENV_MYSQL_USER}"
+    [ "x${DB_ENV_MYSQL_PASSWORD}" = "x" ] || set_secure_config database.password "${DB_ENV_MYSQL_PASSWORD}"
   fi
 
   #Section auth
-  [ -z "${AUTH_TYPE}" ]           || set_gerrit_config auth.type "${AUTH_TYPE}"
-  [ -z "${AUTH_HTTP_HEADER}" ]    || set_gerrit_config auth.httpHeader "${AUTH_HTTP_HEADER}"
-  [ -z "${AUTH_EMAIL_FORMAT}" ]   || set_gerrit_config auth.emailFormat "${AUTH_EMAIL_FORMAT}"
-  [ -z "${AUTH_GIT_BASIC_AUTH}" ] || set_gerrit_config auth.gitBasicAuth "${AUTH_GIT_BASIC_AUTH}"
+  [ "x${AUTH_TYPE}" = "x" ]           || set_gerrit_config auth.type "${AUTH_TYPE}"
+  [ "x${AUTH_HTTP_HEADER}" = "x" ]    || set_gerrit_config auth.httpHeader "${AUTH_HTTP_HEADER}"
+  [ "x${AUTH_EMAIL_FORMAT}" = "x" ]   || set_gerrit_config auth.emailFormat "${AUTH_EMAIL_FORMAT}"
+  [ "x${AUTH_GIT_BASIC_AUTH}" = "x" ] || set_gerrit_config auth.gitBasicAuth "${AUTH_GIT_BASIC_AUTH}"
 
   #Section ldap
   if [ "${AUTH_TYPE}" = 'LDAP' ] || [ "${AUTH_TYPE}" = 'LDAP_BIND' ] ; then
     set_gerrit_config auth.type "${AUTH_TYPE}"
     set_gerrit_config auth.gitBasicAuth true
-    [ -z "${LDAP_SERVER}" ]                   || set_gerrit_config ldap.server "ldap://${LDAP_SERVER}"
-    [ -z "${LDAP_SSLVERIFY}" ]                || set_gerrit_config ldap.sslVerify "${LDAP_SSLVERIFY}"
-    [ -z "${LDAP_GROUPSVISIBLETOALL}" ]       || set_gerrit_config ldap.groupsVisibleToAll "${LDAP_GROUPSVISIBLETOALL}"
-    [ -z "${LDAP_USERNAME}" ]                 || set_gerrit_config ldap.username "${LDAP_USERNAME}"
-    [ -z "${LDAP_PASSWORD}" ]                 || set_secure_config ldap.password "${LDAP_PASSWORD}"
-    [ -z "${LDAP_REFERRAL}" ]                 || set_gerrit_config ldap.referral "${LDAP_REFERRAL}"
-    [ -z "${LDAP_READTIMEOUT}" ]              || set_gerrit_config ldap.readTimeout "${LDAP_READTIMEOUT}"
-    [ -z "${LDAP_ACCOUNTBASE}" ]              || set_gerrit_config ldap.accountBase "${LDAP_ACCOUNTBASE}"
-    [ -z "${LDAP_ACCOUNTSCOPE}" ]             || set_gerrit_config ldap.accountScope "${LDAP_ACCOUNTSCOPE}"
-    [ -z "${LDAP_ACCOUNTPATTERN}" ]           || set_gerrit_config ldap.accountPattern "${LDAP_ACCOUNTPATTERN}"
-    [ -z "${LDAP_ACCOUNTFULLNAME}" ]          || set_gerrit_config ldap.accountFullName "${LDAP_ACCOUNTFULLNAME}"
-    [ -z "${LDAP_ACCOUNTEMAILADDRESS}" ]      || set_gerrit_config ldap.accountEmailAddress "${LDAP_ACCOUNTEMAILADDRESS}"
-    [ -z "${LDAP_ACCOUNTSSHUSERNAME}" ]       || set_gerrit_config ldap.accountSshUserName "${LDAP_ACCOUNTSSHUSERNAME}"
-    [ -z "${LDAP_ACCOUNTMEMBERFIELD}" ]       || set_gerrit_config ldap.accountMemberField "${LDAP_ACCOUNTMEMBERFIELD}"
-    [ -z "${LDAP_FETCHMEMBEROFEAGERLY}" ]     || set_gerrit_config ldap.fetchMemberOfEagerly "${LDAP_FETCHMEMBEROFEAGERLY}"
-    [ -z "${LDAP_GROUPBASE}" ]                || set_gerrit_config ldap.groupBase "${LDAP_GROUPBASE}"
-    [ -z "${LDAP_GROUPSCOPE}" ]               || set_gerrit_config ldap.groupScope "${LDAP_GROUPSCOPE}"
-    [ -z "${LDAP_GROUPPATTERN}" ]             || set_gerrit_config ldap.groupPattern "${LDAP_GROUPPATTERN}"
-    [ -z "${LDAP_GROUPMEMBERPATTERN}" ]       || set_gerrit_config ldap.groupMemberPattern "${LDAP_GROUPMEMBERPATTERN}"
-    [ -z "${LDAP_GROUPNAME}" ]                || set_gerrit_config ldap.groupName "${LDAP_GROUPNAME}"
-    [ -z "${LDAP_LOCALUSERNAMETOLOWERCASE}" ] || set_gerrit_config ldap.localUsernameToLowerCase "${LDAP_LOCALUSERNAMETOLOWERCASE}"
-    [ -z "${LDAP_AUTHENTICATION}" ]           || set_gerrit_config ldap.authentication "${LDAP_AUTHENTICATION}"
-    [ -z "${LDAP_USECONNECTIONPOOLING}" ]     || set_gerrit_config ldap.useConnectionPooling "${LDAP_USECONNECTIONPOOLING}"
-    [ -z "${LDAP_CONNECTTIMEOUT}" ]           || set_gerrit_config ldap.connectTimeout "${LDAP_CONNECTTIMEOUT}"
+    [ "x${LDAP_SERVER}" = "x" ]                   || set_gerrit_config ldap.server "ldap://${LDAP_SERVER}"
+    [ "x${LDAP_SSLVERIFY}" = "x" ]                || set_gerrit_config ldap.sslVerify "${LDAP_SSLVERIFY}"
+    [ "x${LDAP_GROUPSVISIBLETOALL}" = "x" ]       || set_gerrit_config ldap.groupsVisibleToAll "${LDAP_GROUPSVISIBLETOALL}"
+    [ "x${LDAP_USERNAME}" = "x" ]                 || set_gerrit_config ldap.username "${LDAP_USERNAME}"
+    [ "x${LDAP_PASSWORD}" = "x" ]                 || set_secure_config ldap.password "${LDAP_PASSWORD}"
+    [ "x${LDAP_REFERRAL}" = "x" ]                 || set_gerrit_config ldap.referral "${LDAP_REFERRAL}"
+    [ "x${LDAP_READTIMEOUT}" = "x" ]              || set_gerrit_config ldap.readTimeout "${LDAP_READTIMEOUT}"
+    [ "x${LDAP_ACCOUNTBASE}" = "x" ]              || set_gerrit_config ldap.accountBase "${LDAP_ACCOUNTBASE}"
+    [ "x${LDAP_ACCOUNTSCOPE}" = "x" ]             || set_gerrit_config ldap.accountScope "${LDAP_ACCOUNTSCOPE}"
+    [ "x${LDAP_ACCOUNTPATTERN}" = "x" ]           || set_gerrit_config ldap.accountPattern "${LDAP_ACCOUNTPATTERN}"
+    [ "x${LDAP_ACCOUNTFULLNAME}" = "x" ]          || set_gerrit_config ldap.accountFullName "${LDAP_ACCOUNTFULLNAME}"
+    [ "x${LDAP_ACCOUNTEMAILADDRESS}" = "x" ]      || set_gerrit_config ldap.accountEmailAddress "${LDAP_ACCOUNTEMAILADDRESS}"
+    [ "x${LDAP_ACCOUNTSSHUSERNAME}" = "x" ]       || set_gerrit_config ldap.accountSshUserName "${LDAP_ACCOUNTSSHUSERNAME}"
+    [ "x${LDAP_ACCOUNTMEMBERFIELD}" = "x" ]       || set_gerrit_config ldap.accountMemberField "${LDAP_ACCOUNTMEMBERFIELD}"
+    [ "x${LDAP_FETCHMEMBEROFEAGERLY}" = "x" ]     || set_gerrit_config ldap.fetchMemberOfEagerly "${LDAP_FETCHMEMBEROFEAGERLY}"
+    [ "x${LDAP_GROUPBASE}" = "x" ]                || set_gerrit_config ldap.groupBase "${LDAP_GROUPBASE}"
+    [ "x${LDAP_GROUPSCOPE}" = "x" ]               || set_gerrit_config ldap.groupScope "${LDAP_GROUPSCOPE}"
+    [ "x${LDAP_GROUPPATTERN}" = "x" ]             || set_gerrit_config ldap.groupPattern "${LDAP_GROUPPATTERN}"
+    [ "x${LDAP_GROUPMEMBERPATTERN}" = "x" ]       || set_gerrit_config ldap.groupMemberPattern "${LDAP_GROUPMEMBERPATTERN}"
+    [ "x${LDAP_GROUPNAME}" = "x" ]                || set_gerrit_config ldap.groupName "${LDAP_GROUPNAME}"
+    [ "x${LDAP_LOCALUSERNAMETOLOWERCASE}" = "x" ] || set_gerrit_config ldap.localUsernameToLowerCase "${LDAP_LOCALUSERNAMETOLOWERCASE}"
+    [ "x${LDAP_AUTHENTICATION}" = "x" ]           || set_gerrit_config ldap.authentication "${LDAP_AUTHENTICATION}"
+    [ "x${LDAP_USECONNECTIONPOOLING}" = "x" ]     || set_gerrit_config ldap.useConnectionPooling "${LDAP_USECONNECTIONPOOLING}"
+    [ "x${LDAP_CONNECTTIMEOUT}" = "x" ]           || set_gerrit_config ldap.connectTimeout "${LDAP_CONNECTTIMEOUT}"
   fi
 
   # section OAUTH general
   if [ "${AUTH_TYPE}" = 'OAUTH' ]  ; then
     cp -f ${GERRIT_HOME}/gerrit-oauth-provider.jar ${GERRIT_SITE}/plugins/gerrit-oauth-provider.jar
     set_gerrit_config auth.type "${AUTH_TYPE}"
-    [ -z "${OAUTH_ALLOW_EDIT_FULL_NAME}" ]     || set_gerrit_config oauth.allowEditFullName "${OAUTH_ALLOW_EDIT_FULL_NAME}"
-    [ -z "${OAUTH_ALLOW_REGISTER_NEW_EMAIL}" ] || set_gerrit_config oauth.allowRegisterNewEmail "${OAUTH_ALLOW_REGISTER_NEW_EMAIL}"
+    [ "x${OAUTH_ALLOW_EDIT_FULL_NAME}" = "x" ]     || set_gerrit_config oauth.allowEditFullName "${OAUTH_ALLOW_EDIT_FULL_NAME}"
+    [ "x${OAUTH_ALLOW_REGISTER_NEW_EMAIL}" = "x" ] || set_gerrit_config oauth.allowRegisterNewEmail "${OAUTH_ALLOW_REGISTER_NEW_EMAIL}"
 
     # Google
-    [ -z "${OAUTH_GOOGLE_RESTRICT_DOMAIN}" ]   || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.domain "${OAUTH_GOOGLE_RESTRICT_DOMAIN}"
-    [ -z "${OAUTH_GOOGLE_CLIENT_ID}" ]         || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.client-id "${OAUTH_GOOGLE_CLIENT_ID}"
-    [ -z "${OAUTH_GOOGLE_CLIENT_SECRET}" ]     || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.client-secret "${OAUTH_GOOGLE_CLIENT_SECRET}"
-    [ -z "${OAUTH_GOOGLE_LINK_OPENID}" ]       || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.link-to-existing-openid-accounts "${OAUTH_GOOGLE_LINK_OPENID}"
+    [ "x${OAUTH_GOOGLE_RESTRICT_DOMAIN}" = "x" ]   || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.domain "${OAUTH_GOOGLE_RESTRICT_DOMAIN}"
+    [ "x${OAUTH_GOOGLE_CLIENT_ID}" = "x" ]         || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.client-id "${OAUTH_GOOGLE_CLIENT_ID}"
+    [ "x${OAUTH_GOOGLE_CLIENT_SECRET}" = "x" ]     || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.client-secret "${OAUTH_GOOGLE_CLIENT_SECRET}"
+    [ "x${OAUTH_GOOGLE_LINK_OPENID}" = "x" ]       || set_gerrit_config plugin.gerrit-oauth-provider-google-oauth.link-to-existing-openid-accounts "${OAUTH_GOOGLE_LINK_OPENID}"
 
     # Github
-    [ -z "${OAUTH_GITHUB_CLIENT_ID}" ]         || set_gerrit_config plugin.gerrit-oauth-provider-github-oauth.client-id "${OAUTH_GITHUB_CLIENT_ID}"
-    [ -z "${OAUTH_GITHUB_CLIENT_SECRET}" ]     || set_gerrit_config plugin.gerrit-oauth-provider-github-oauth.client-secret "${OAUTH_GITHUB_CLIENT_SECRET}"
+    [ "x${OAUTH_GITHUB_CLIENT_ID}" = "x" ]         || set_gerrit_config plugin.gerrit-oauth-provider-github-oauth.client-id "${OAUTH_GITHUB_CLIENT_ID}"
+    [ "x${OAUTH_GITHUB_CLIENT_SECRET}" = "x" ]     || set_gerrit_config plugin.gerrit-oauth-provider-github-oauth.client-secret "${OAUTH_GITHUB_CLIENT_SECRET}"
   fi
 
   # section container
-  [ -z "${JAVA_HEAPLIMIT}" ] || set_gerrit_config container.heapLimit "${JAVA_HEAPLIMIT}"
-  [ -z "${JAVA_OPTIONS}" ]   || set_gerrit_config container.javaOptions "${JAVA_OPTIONS}"
-  [ -z "${JAVA_SLAVE}" ]     || set_gerrit_config container.slave "${JAVA_SLAVE}"
+  [ "x${JAVA_HEAPLIMIT}" = "x" ] || set_gerrit_config container.heapLimit "${JAVA_HEAPLIMIT}"
+  [ "x${JAVA_OPTIONS}" = "x" ]   || set_gerrit_config container.javaOptions "${JAVA_OPTIONS}"
+  [ "x${JAVA_SLAVE}" = "x" ]     || set_gerrit_config container.slave "${JAVA_SLAVE}"
 
   #Section sendemail
-  if [ -z "${SMTP_SERVER}" ]; then
+  if [ "x${SMTP_SERVER}" = "x" ]; then
     set_gerrit_config sendemail.enable false
   else
     set_gerrit_config sendemail.enable true
@@ -138,27 +141,30 @@ if [ "$1" = "/gerrit-start.sh" ]; then
       set_gerrit_config sendemail.smtpServerPort 587
       set_gerrit_config sendemail.smtpEncryption tls
     fi
-    [ -z "${SMTP_SERVER_PORT}" ] || set_gerrit_config sendemail.smtpServerPort "${SMTP_SERVER_PORT}"
-    [ -z "${SMTP_USER}" ]        || set_gerrit_config sendemail.smtpUser "${SMTP_USER}"
-    [ -z "${SMTP_PASS}" ]        || set_secure_config sendemail.smtpPass "${SMTP_PASS}"
-    [ -z "${SMTP_ENCRYPTION}" ]      || set_gerrit_config sendemail.sendemail.smtpEncryption "${SMTP_ENCRYPTION}"
-    [ -z "${SMTP_CONNECT_TIMEOUT}" ] || set_gerrit_config sendemail.connectTimeout "${SMTP_CONNECT_TIMEOUT}"
-    [ -z "${SMTP_FROM}" ]            || set_gerrit_config sendemail.from "${SMTP_FROM}"
+    [ "x${SMTP_SERVER_PORT}" = "x" ] || set_gerrit_config sendemail.smtpServerPort "${SMTP_SERVER_PORT}"
+    [ "x${SMTP_USER}" = "x" ]        || set_gerrit_config sendemail.smtpUser "${SMTP_USER}"
+    [ "x${SMTP_PASS}" = "x" ]        || set_secure_config sendemail.smtpPass "${SMTP_PASS}"
+    [ "x${SMTP_ENCRYPTION}" = "x" ]      || set_gerrit_config sendemail.sendemail.smtpEncryption "${SMTP_ENCRYPTION}"
+    [ "x${SMTP_CONNECT_TIMEOUT}" = "x" ] || set_gerrit_config sendemail.connectTimeout "${SMTP_CONNECT_TIMEOUT}"
+    [ "x${SMTP_FROM}" = "x" ]            || set_gerrit_config sendemail.from "${SMTP_FROM}"
   fi
 
   #Section user
-    [ -z "${USER_NAME}" ]             || set_gerrit_config user.name "${USER_NAME}"
-    [ -z "${USER_EMAIL}" ]            || set_gerrit_config user.email "${USER_EMAIL}"
-    [ -z "${USER_ANONYMOUS_COWARD}" ] || set_gerrit_config user.anonymousCoward "${USER_ANONYMOUS_COWARD}"
+    [ "x${USER_NAME}" = "x" ]             || set_gerrit_config user.name "${USER_NAME}"
+    [ "x${USER_EMAIL}" = "x" ]            || set_gerrit_config user.email "${USER_EMAIL}"
+    [ "x${USER_ANONYMOUS_COWARD}" = "x" ] || set_gerrit_config user.anonymousCoward "${USER_ANONYMOUS_COWARD}"
 
   #Section plugins
   set_gerrit_config plugins.allowRemoteAdmin true
 
   #Section httpd
-  [ -z "${HTTPD_LISTENURL}" ] || set_gerrit_config httpd.listenUrl "${HTTPD_LISTENURL}"
+  [ "x${HTTPD_LISTENURL}" = "x" ] || set_gerrit_config httpd.listenUrl "${HTTPD_LISTENURL}"
 
   #Section gitweb
   set_gerrit_config gitweb.cgi "/usr/share/gitweb/gitweb.cgi"
+
+  #Section cache
+  [ "x${GERRIT_CACHE_DIR}" = "x" ] || set_gerrit_config cache.directory "${GERRIT_CACHE_DIR}"
 
   echo "Upgrading gerrit..."
   su-exec ${GERRIT_USER} java -jar "${GERRIT_WAR}" init --batch -d "${GERRIT_SITE}" ${GERRIT_INIT_ARGS}
