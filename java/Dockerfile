@@ -46,3 +46,6 @@ RUN apk add --no-cache --virtual .build-deps curl ca-certificates tar && \
     rm -fr /tmp/*
 
 ENV PATH=${PATH}:${JAVA_HOME}/bin
+
+ENTRYPOINT [ "/opt/jre/bin/java" ]
+CMD [ "-version" ]
