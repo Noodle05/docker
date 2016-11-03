@@ -14,7 +14,12 @@ do
     echo 0 > $each/send_redirects
 done
 
-if [ ! -f /etc/ipsec.secrets ]; then
+if [ ! -d /config/ipsec.d ]; then
+    echo "creating ipsec.d"
+    cp -R /orig-config/ipsec.d /config/
+fi
+
+if [ ! -f /config/ipsec.secrets ]; then
     if [ "$VPN_PASSWORD" = "password" ] || [ "$VPN_PASSWORD" = "" ]; then
         # Generate a random password
         P1=`cat /dev/urandom | tr -cd abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 | head -c 3`
@@ -37,7 +42,7 @@ if [ ! -f /etc/ipsec.secrets ]; then
         echo "It is not recommended to use the same secret as password and PSK key!"
     fi
 
-    cat > /etc/ipsec.secrets <<EOF
+    cat > /config/ipsec.secrets <<EOF
 # This file holds shared secrets or RSA private keys for authentication.
 # RSA private key for this host, authenticating it to any other host
 # which knows the public part.  Suitable public keys, for ipsec.conf, DNS,
