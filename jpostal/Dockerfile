@@ -37,7 +37,7 @@ RUN \
  && export JAVA_HOME=/usr/lib/jvm/default-jvm \
  && export PATH=$PATH:$JAVA_HOME/bin \
  && /tmp/src/jpostal/gradlew assemble \
-# && cp /tmp/src/jpostal/build/libs/jpostal.jar / \
+ && cp /tmp/src/jpostal/build/libs/jpostal.jar /usr/lib/jvm/default-jvm/jre/lib/ext/ \
  && cd / \
  && apk del .build-deps \
  && rm -fr .build-deps /tmp/src /tmp/hsperfdata_root /root/.gradle /root/.ash_history
