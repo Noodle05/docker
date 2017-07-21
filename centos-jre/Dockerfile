@@ -1,14 +1,15 @@
 FROM centos:7.3.1611
 
 ARG JAVA_VERSION=8
-ARG JAVA_UPD=131
-ARG JAVA_BUILD=b11
+ARG JAVA_UPD=141
+ARG JAVA_BUILD=b15
 ARG JED="${JAVA_VERSION}u${JAVA_UPD}"
 ARG JRE="jdk1.${JAVA_VERSION}.0_${JAVA_UPD}"
+ARG JAVA_HASH=336fa29ff2bb4ef291e347e091f7f4a7
 
 RUN yum install -y -q unzip \
  && curl -kL -H 'Cookie: oraclelicense=accept-securebackup-cookie' \
-    "http://download.oracle.com/otn-pub/java/jdk/${JED}-${JAVA_BUILD}/d54c1d3a095b4ff2b6607d096fa80163/server-jre-${JED}-linux-x64.tar.gz" \
+    "http://download.oracle.com/otn-pub/java/jdk/${JED}-${JAVA_BUILD}/${JAVA_HASH}/server-jre-${JED}-linux-x64.tar.gz" \
     | tar --no-same-owner -C /opt -zxf - \
  && curl -kL -o /tmp/jce_policy.zip -H 'Cookie: oraclelicense=accept-securebackup-cookie' \
     "http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip" \
