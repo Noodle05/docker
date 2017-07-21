@@ -23,7 +23,8 @@ RUN yum install -y -q unzip \
  && yum remove -q -y unzip \
  && yum clean all -q \
  && rm -fr /var/cache/yum/* /tmp/yum_save*.yumtx /root/.pki \
- && alternatives --install /usr/bin/java java "/opt/${JRE}/bin/java" 1
+ && alternatives --install /usr/bin/java java "/opt/${JRE}/bin/java" 1 \
+                 --slave /usr/bin/jar jar "/opt/${JRE}/bin/jar"
 
 LABEL java.version="${JED}"
 
