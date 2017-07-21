@@ -1,4 +1,4 @@
-FROM centos:7.3.1611
+FROM noodle/centos-suexec:7.3.1611
 
 ARG JAVA_VERSION=8
 ARG JAVA_UPD=141
