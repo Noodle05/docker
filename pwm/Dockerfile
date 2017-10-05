@@ -5,7 +5,9 @@ ARG PSQL_JDBC_VERSION=42.1.4
 ARG MARIADB_JDBC_VERSION=2.1.2
 ARG MAVEN_CENTRAL_URL=http://central.maven.org/maven2
 
-RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=http-forwarded \
+USER root
+
+RUN java -jar "$JETTY_HOME/start.jar" --create-startd --add-to-start=http-forwarded \
  && apk add --no-cache --virtual .build-deps curl libarchive-tools \
  && mkdir $JETTY_BASE/webapps/ROOT/ \
  && curl -Ls "https://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2017-10-04T14:48:41Z-release-bundle.zip" \
@@ -19,6 +21,8 @@ RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=http-forwarded \
  && apk del .build-deps \
  && rm -fr .bulid-deps \
  && rm -fr /tmp/hsperfdata_root
+
+USER jetty
 
 ENV PWM_APPLICATIONPATH=/config
 
