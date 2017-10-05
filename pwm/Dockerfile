@@ -1,14 +1,14 @@
-FROM jetty:9-jre8-alpine
+FROM jetty:9.4.7-jre8-alpine
 MAINTAINER Wei Gao<wei@gaofamily.org>
 
-ARG PSQL_JDBC_VERSION=9.4.1211.jre7
-ARG MARIADB_JDBC_VERSION=1.5.4
+ARG PSQL_JDBC_VERSION=42.1.4
+ARG MARIADB_JDBC_VERSION=2.1.2
 ARG MAVEN_CENTRAL_URL=http://central.maven.org/maven2
 
 RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=http-forwarded \
  && apk add --no-cache --virtual .build-deps curl libarchive-tools \
  && mkdir $JETTY_BASE/webapps/ROOT/ \
- && curl -Ls "http://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2017-02-19T20:34:49Z-pwm-bundle.zip" \
+ && curl -Ls "https://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2017-10-04T14:48:41Z-release-bundle.zip" \
   | bsdtar --include "pwm*.war" -xOf - \
   | bsdtar -C $JETTY_BASE/webapps/ROOT -xf - \
  && mv $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig-sample.xml $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig.xml \
