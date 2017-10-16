@@ -12,7 +12,7 @@ ENV GERRIT_USER=gerrit2
 ENV GERRIT_INIT_ARGS=""
 ENV PLUGIN_VERSION=stable-2.14
 ENV GERRITFORGE_URL=https://gerrit-ci.gerritforge.com
-ENV GERRITFORGE_ARTIFACT_DIR=lastSuccessfulBuild/artifact/buck-out/gen/plugins
+ENV GERRITFORGE_ARTIFACT_DIR=lastSuccessfulBuild/artifact/bazel-genfiles/plugins
 ENV BOUNCY_CASTLE_VERSION=154
 ENV BOUNCY_CASTLE_URL=https://downloads.bouncycastle.org/java
 
@@ -25,8 +25,8 @@ RUN adduser -u 100 -D -h "$GERRIT_HOME" -S $GERRIT_USER && \
     apk add --no-cache --virtual .build-deps curl && \
     mkdir /docker-entrypoint-init.d && \
     curl -Ls https://gerrit-releases.storage.googleapis.com/gerrit-${GERRIT_VERSION}.war -o $GERRIT_WAR && \
-    curl -Ls ${GERRITFORGE_URL}/job/plugin-delete-project-${PLUGIN_VERSION}/${GERRITFORGE_ARTIFACT_DIR}/delete-project/delete-project.jar -o ${GERRIT_HOME}/delete-project.jar && \
-    curl -Ls ${GERRITFORGE_URL}/job/plugin-events-log-${PLUGIN_VERSION}/${GERRITFORGE_ARTIFACT_DIR}/events-log/events-log.jar -o ${GERRIT_HOME}/events-log.jar && \
+    curl -Ls ${GERRITFORGE_URL}/job/plugin-delete-project-bazel-${PLUGIN_VERSION}/${GERRITFORGE_ARTIFACT_DIR}/delete-project/delete-project.jar -o ${GERRIT_HOME}/delete-project.jar && \
+    curl -Ls ${GERRITFORGE_URL}/job/plugin-events-log-bazel-${PLUGIN_VERSION}/${GERRITFORGE_ARTIFACT_DIR}/events-log/events-log.jar -o ${GERRIT_HOME}/events-log.jar && \
     curl -Ls ${GERRITFORGE_URL}/job/plugin-gerrit-oauth-provider-gh-master/${GERRITFORGE_ARTIFACT_DIR}/gerrit-oauth-provider/gerrit-oauth-provider.jar -o ${GERRIT_HOME}/gerrit-oauth-provider.jar && \
     curl -Ls ${BOUNCY_CASTLE_URL}/bcprov-jdk15on-${BOUNCY_CASTLE_VERSION}.jar -o ${GERRIT_HOME}/bcprov-jdk15on-${BOUNCY_CASTLE_VERSION}.jar && \
     curl -Ls ${BOUNCY_CASTLE_URL}/bcpkix-jdk15on-${BOUNCY_CASTLE_VERSION}.jar -o ${GERRIT_HOME}/bcpkix-jdk15on-${BOUNCY_CASTLE_VERSION}.jar && \
