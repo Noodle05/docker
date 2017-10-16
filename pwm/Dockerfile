@@ -10,7 +10,7 @@ USER root
 RUN java -jar "$JETTY_HOME/start.jar" --create-startd --add-to-start=http-forwarded \
  && apk add --no-cache --virtual .build-deps curl libarchive-tools \
  && mkdir $JETTY_BASE/webapps/ROOT/ \
- && curl -Ls "https://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2017-10-10T09:18:48Z-release-bundle.zip" \
+ && curl -Ls "https://www.pwm-project.org/artifacts/pwm/pwm-1.8.0-SNAPSHOT-2017-02-19T20:34:49Z-pwm-bundle.zip" \
   | bsdtar --include "pwm*.war" -xOf - \
   | bsdtar -C $JETTY_BASE/webapps/ROOT -xf - \
  && mv $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig-sample.xml $JETTY_BASE/webapps/ROOT/WEB-INF/log4jconfig.xml \
