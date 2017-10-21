@@ -73,7 +73,7 @@ customize_config() {
 
     # section OAUTH general
     if [ "${AUTH_TYPE}" = 'OAUTH' ]  ; then
-        cp -f ${GERRIT_HOME}/gerrit-oauth-provider.jar ${GERRIT_SITE}/plugins/gerrit-oauth-provider.jar
+        cp -f ${GERRIT_HOME}/oauth.jar ${GERRIT_SITE}/plugins/oauth.jar
         set_gerrit_config auth.type "${AUTH_TYPE}"
         [ "x${OAUTH_ALLOW_EDIT_FULL_NAME}" = "x" ]     || set_gerrit_config oauth.allowEditFullName "${OAUTH_ALLOW_EDIT_FULL_NAME}"
         [ "x${OAUTH_ALLOW_REGISTER_NEW_EMAIL}" = "x" ] || set_gerrit_config oauth.allowRegisterNewEmail "${OAUTH_ALLOW_REGISTER_NEW_EMAIL}"
