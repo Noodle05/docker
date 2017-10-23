@@ -1,11 +1,11 @@
-FROM noodle05/centos-suexec:7.3.1611
+FROM noodle05/centos-suexec:7.4.1708
 
 ARG JAVA_VERSION=8
-ARG JAVA_UPD=141
-ARG JAVA_BUILD=b15
+ARG JAVA_UPD=151
+ARG JAVA_BUILD=b12
 ARG JED="${JAVA_VERSION}u${JAVA_UPD}"
 ARG JRE="jdk1.${JAVA_VERSION}.0_${JAVA_UPD}"
-ARG JAVA_HASH=336fa29ff2bb4ef291e347e091f7f4a7
+ARG JAVA_HASH=e758a0de34e24606bca991d704f6dcbf
 
 RUN yum install -y -q unzip \
  && curl -kL -H 'Cookie: oraclelicense=accept-securebackup-cookie' \

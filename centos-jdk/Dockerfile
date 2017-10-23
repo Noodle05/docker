@@ -1,16 +1,15 @@
-FROM centos:7
-MAINTAINER Wei Gao<wei@gaofamily.org>
+FROM noodle05/centos-suexec:7.4.1708
 
 ARG JAVA_VERSION=8
-ARG JAVA_UPD=121
-ARG JAVA_BUILD=b13
+ARG JAVA_UPD=151
+ARG JAVA_BUILD=b12
 ARG JED=${JAVA_VERSION}u${JAVA_UPD}
 ARG JDK=jdk1.${JAVA_VERSION}.0_${JAVA_UPD}
+ARG JAVA_HASH=e758a0de34e24606bca991d704f6dcbf
 
-RUN (yum update || yum -y upgrade) \
- && yum install -y unzip \
+RUN yum install -y unzip \
  && curl -kL -H 'Cookie: oraclelicense=accept-securebackup-cookie' \
-    "http://download.oracle.com/otn-pub/java/jdk/${JED}-${JAVA_BUILD}/e9e7ea248e2c4826b92b3f075a80e441//jdk-${JED}-linux-x64.tar.gz" \
+    "http://download.oracle.com/otn-pub/java/jdk/${JED}-${JAVA_BUILD}/${JAVA_HASH}/jdk-${JED}-linux-x64.tar.gz" \
     | tar -C /opt -zxf - \
  && curl -kL -o /tmp/jce_policy.zip -H 'Cookie: oraclelicense=accept-securebackup-cookie' \
     "http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip" \
@@ -27,5 +26,7 @@ RUN (yum update || yum -y upgrade) \
  && alternatives --install /usr/bin/java java /opt/${JDK}/bin/java 1 \
  && alternatives --install /usr/bin/javac javac /opt/${JDK}/bin/javac 1 \
  && alternatives --install /usr/bin/jar jar /opt/${JDK}/bin/jar 1
+
+LABEL java.version="${JED}"
 
 ENV JAVA_HOME=/opt/${JDK}
