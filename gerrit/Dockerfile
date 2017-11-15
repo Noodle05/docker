@@ -22,8 +22,7 @@ COPY gerrit-start.sh /
 # Add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN adduser -u 100 -D -h "$GERRIT_HOME" -S $GERRIT_USER && \
     apk add --no-cache git-gitweb su-exec perl-cgi && \
-    apk add --no-cache --virtual .build-deps curl libcap && \
-    setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java)) && \
+    apk add --no-cache --virtual .build-deps curl && \
     mkdir /docker-entrypoint-init.d && \
     curl -Ls https://gerrit-releases.storage.googleapis.com/gerrit-${GERRIT_VERSION}.war -o $GERRIT_WAR && \
     curl -Ls ${GERRITFORGE_URL}/job/plugin-delete-project-bazel-${PLUGIN_VERSION}/${GERRITFORGE_ARTIFACT_DIR}/delete-project/delete-project.jar -o ${GERRIT_HOME}/delete-project.jar && \
