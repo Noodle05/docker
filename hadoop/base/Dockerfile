@@ -1,41 +1,43 @@
-FROM noodle05/centos-jre:7.3.1611-8_141-b15
+FROM openjdk:9.0.1-11-jre-sid
 
-ARG HADOOP_VERSION=2.8.0
-ARG DOWNLOAD_URL=http://apache.mirrors.tds.net/hadoop/common
-ARG HADOOP_URL="${DOWNLOAD_URL}/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz"
+ARG HADOOP_VERSION="3.0.0"
+ARG HADOOP_BASE="/opt"
+ARG HADOOP_FULLNAME="hadoop-${HADOOP_VERSION}"
+ARG HADOOP_DOWNLOAD_URL="http://apache.claz.org/hadoop/common/${HADOOP_FULLNAME}/${HADOOP_FULLNAME}.tar.gz"
+ARG HADOOP_UID=1000
+ARG HADOOP_GID=1000
 
-ENV HADOOP_HOME=/opt/hadoop \
-    HADOOP_USER=hadoop \
-    HADOOP_CONF_DIR=/etc/hadoop \
-    HADOOP_PID_DIR=/var/run/hadoop \
-    HADOOP_DATA_DIR=/var/lib/hadoop \
-    HADOOP_LOG_DIR=/var/log/hadoop
+ENV HADOOP_HOME="/opt/hadoop" \
+    HADOOP_PID_DIR="/var/run/hadoop" \
+    HADOOP_LOG_DIR="/var/log/hadoop" \
+    HADOOP_USER="hadoop" \
+    HADOOP_CONFIG_DIR="/etc/hadoop" \
+    HADOOP_DATA_DIR="/var/lib/hadoop" \
+    HADOOP_CONFIG_TEMP_DIR="/config_template"
 
-ENV HADOOP_NAMENODE_OPTS="" \
-    HADOOP_DATANODE_OPTS="" \
-    HADOOP_SECONDARYNAMENODE_OPTS="" \
-    YARN_RESOURCEMANAGER_OPTS="" \
-    YARN_NODEMANAGER_OPTS="" \
-    YARN_PROXYSERVER_OPTS="" \
-    HADOOP_JOB_HISTORYSERVER_OPTS=""
+ENV HADOOP_NAMENODE_URI="hdfs://localhost"
 
 ENV JAVA_HEAPSIZE="1g" \
     JAVA_GC_OPTS="-XX:+UseG1GC" \
     JAVA_GC_LOG_OPTS=""
 
-ENV CUSTOMIZE_SCRIPT_FOLDER=/custom_scripts
+ENV SCRIPTS_DIR="/scripts" \
+    USER_ADDITION_SCRIPTS_DIR="/user_addition_scripts" \
+    ROOT_ADDITION_SCRIPTS_DIR="/root_addition_scripts"
 
-RUN yum install -y -q snappy which openssh-server openssh-clients \
- && ln -snf /usr/lib64/libcrypto.so.1.0.1e /usr/lib64/libcrypto.so \
- && /usr/bin/ssh-keygen -A \
- && sed -ri 's/^session\s+required\s+pam_loginuid.so$/session optional pam_loginuid.so/' /etc/pam.d/sshd \
- && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
- && echo "UserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config \
- && groupadd -r -g 150 "${HADOOP_USER}" \
- && useradd -r -g "${HADOOP_USER}" -M -u 151 -d "${HADOOP_HOME}" "${HADOOP_USER}" \
- && curl -sL "${HADOOP_URL}" \
-  | tar --no-same-owner -C /opt -zx \
- && mv "/opt/hadoop-${HADOOP_VERSION}" "${HADOOP_HOME}" \
+ARG SU_EXEC_VERSION=0.2
+ARG SU_EXEC_URL="https://github.com/ncopa/su-exec/archive/v${SU_EXEC_VERSION}.tar.gz"
+
+RUN apt-get update && apt-get -y install gcc make \
+ && curl -sL "${SU_EXEC_URL}" | tar -C /tmp -zx \
+ && make -C "/tmp/su-exec-${SU_EXEC_VERSION}" \
+ && cp "/tmp/su-exec-${SU_EXEC_VERSION}/su-exec" /usr/bin \
+ && rm -fr "/tmp/su-exec-${SU_EXEC_VERSION}" \
+ && groupadd -g "${HADOOP_GID}" -r "${HADOOP_USER}" \
+ && useradd -g "${HADOOP_USER}" -u "${HADOOP_UID}" -d "${HADOOP_HOME}" -M -r -s "/bin/bash" "${HADOOP_USER}" \
+ && mkdir -p "${HADOOP_BASE}" \
+ && curl -L "${HADOOP_DOWNLOAD_URL}" | tar -C "${HADOOP_BASE}" --no-same-owner -xzf - \
+ && ln -snf "${HADOOP_BASE}/${HADOOP_FULLNAME}" "${HADOOP_HOME}" \
  && rm -fr "${HADOOP_HOME}/include" "${HADOOP_HOME}/lib/native/examples" \
     "${HADOOP_HOME}/share/doc" \
  && find "${HADOOP_HOME}/share/hadoop" -name sources -type d -prune -exec rm -fr {} \; \
@@ -45,34 +47,19 @@ RUN yum install -y -q snappy which openssh-server openssh-clients \
  && find "${HADOOP_HOME}/share/hadoop" -name "lib-examples" -type d -prune -exec rm -fr {} \; \
  && find "${HADOOP_HOME}/share/hadoop" -name "*-tests.jar" -type f -exec rm -f {} \; \
  && mv "${HADOOP_HOME}/etc" /hadoop_etc_orig \
- && mkdir -p "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}" "${HADOOP_CONF_DIR}" \
- && chown -R "${HADOOP_USER}":"${HADOOP_USER}" "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}" "${HADOOP_CONF_DIR}" \
- && mkdir -p "${HADOOP_HOME}/.ssh" \
- && chmod 700 "${HADOOP_HOME}/.ssh" \
- && ssh-keygen -q -N "" -t rsa -b 4096 -f "${HADOOP_HOME}/.ssh/id_rsa" \
- && cp "${HADOOP_HOME}/.ssh/id_rsa.pub" "${HADOOP_HOME}/.ssh/authorized_keys" \
- && chown -R "${HADOOP_USER}":"${HADOOP_USER}" "${HADOOP_HOME}/.ssh" \
- && mkdir -p /scripts "${CUSTOMIZE_SCRIPT_FOLDER}" \
- && yum clean all \
- && rm -fr /tmp/yum_save*.yumtx /var/cache/yum/*
+ && mkdir -p "${HADOOP_CONFIG_TEMP_DIR}" "${SCRIPTS_DIR}" \
+ && mkdir -p "${HADOOP_PID_DIR}" "${HADOOP_DATA_DIR}" "${HADOOP_CONFIG_DIR}" "${HADOOP_LOG_DIR}" \
+ && chown -R "${HADOOP_USER}:${HADOOP_USER}" "${HADOOP_PID_DIR}" "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}" \
+ && mkdir -p /scripts "${USER_ADDITION_SCRIPTS_DIR}" "${ROOT_ADDITION_SCRIPTS_DIR}" \
+ && apt-get -y autoremove --purge gcc make \
+ && apt-get -y clean \
+ && rm -fr /var/lib/apt/lists/*
 
-ADD docker-entrypoint.sh /
-ADD start-server.sh /
+ADD docker-entrypoint.sh "${SCRIPTS_DIR}"
+ADD core-site.xml.tmpl "${HADOOP_CONFIG_TEMP_DIR}"
 
 VOLUME "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}"
 
-USER "${HADOOP_USER}"
-
 WORKDIR "${HADOOP_HOME}"
 
-# Hdfs ports
-EXPOSE 50010 50020 50070 50075 50090
-# Mapred ports
-EXPOSE 19888
-#Yarn ports
-EXPOSE 8030 8031 8032 8033 8040 8042 8088
-#Other ports
-EXPOSE 49707 22
-
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
-CMD [ "namenode" ]
+ENTRYPOINT [ "/scripts/docker-entrypoint.sh" ]
