@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -ex
-
 if [ "$(id -u)" = "0" ]; then
     if [ ! -d "${HADOOP_CONFIG_DIR}" ]; then
         mkdir -p "${HADOOP_CONFIG_DIR}"
