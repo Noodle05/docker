@@ -1,0 +1,12 @@
+FROM arm64v8/alpine:3.8
+
+ARG VERSION="1.6"
+ARG PROGRAM_NAME="IntelliJIDEALicenseServer_linux_arm"
+
+ENV LISTEN_PORT="1027"
+
+COPY "${PROGRAM_NAME}.${VERSION}" "/usr/sbin/${PROGRAM_NAME}"
+
+EXPOSE "${LISTEN_PORT}"
+
+ENTRYPOINT [ "/usr/sbin/IntelliJIDEALicenseServer_linux_arm" ]
