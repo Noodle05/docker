@@ -7,13 +7,13 @@ ENV GERRIT_HOME=/var/gerrit
 ENV GERRIT_CACHE_DIR=${GERRIT_HOME}/cache
 ENV GERRIT_SITE=${GERRIT_HOME}/review_site
 ENV GERRIT_WAR=${GERRIT_HOME}/gerrit.war
-ENV GERRIT_VERSION=2.14.6
+ENV GERRIT_VERSION=2.15.3
 ENV GERRIT_USER=gerrit2
 ENV GERRIT_INIT_ARGS=""
-ENV PLUGIN_VERSION=stable-2.14
+ENV PLUGIN_VERSION=stable-2.15
 ENV GERRITFORGE_URL=https://gerrit-ci.gerritforge.com
 ENV GERRITFORGE_ARTIFACT_DIR=lastSuccessfulBuild/artifact/bazel-genfiles/plugins
-ENV BOUNCY_CASTLE_VERSION=154
+ENV BOUNCY_CASTLE_VERSION=160
 ENV BOUNCY_CASTLE_URL=https://downloads.bouncycastle.org/java
 
 COPY gerrit-entrypoint.sh /
@@ -34,7 +34,8 @@ RUN adduser -u 100 -D -h "$GERRIT_HOME" -S $GERRIT_USER && \
     su-exec ${GERRIT_USER} mkdir -p $GERRIT_CACHE_DIR && \
     apk del .build-deps && \
     rm -fr .build-deps && \
-    rm -fr /tmp/hsprefdata_root
+    rm -fr /tmp/hsprefdata_root && \
+    rm -fr /var/cache/apk/*
 
 #Gerrit site directory is a volume, so configuration and repositories
 #can be persisted and survive image upgrades.
