@@ -1,9 +1,9 @@
-FROM openjdk:9.0.1-11-jre-sid
+FROM openjdk:11.0.1-jre-sid
 
-ARG HADOOP_VERSION="3.0.0"
+ARG HADOOP_VERSION="3.1.1"
 ARG HADOOP_BASE="/opt"
 ARG HADOOP_FULLNAME="hadoop-${HADOOP_VERSION}"
-ARG HADOOP_DOWNLOAD_URL="http://apache.claz.org/hadoop/common/${HADOOP_FULLNAME}/${HADOOP_FULLNAME}.tar.gz"
+ARG HADOOP_DOWNLOAD_URL="https://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=hadoop/common/${HADOOP_FULLNAME}/${HADOOP_FULLNAME}.tar.gz"
 ARG HADOOP_UID=1000
 ARG HADOOP_GID=1000
 
@@ -11,9 +11,9 @@ ENV HADOOP_HOME="/opt/hadoop" \
     HADOOP_PID_DIR="/var/run/hadoop" \
     HADOOP_LOG_DIR="/var/log/hadoop" \
     HADOOP_USER="hadoop" \
-    HADOOP_CONFIG_DIR="/etc/hadoop" \
+    HADOOP_CONF_DIR="/etc/hadoop" \
     HADOOP_DATA_DIR="/var/lib/hadoop" \
-    HADOOP_CONFIG_TEMP_DIR="/config_template"
+    HADOOP_CONF_TEMP_DIR="/config_template"
 
 ENV HADOOP_NAMENODE_URI="hdfs://localhost"
 
@@ -24,6 +24,8 @@ ENV JAVA_HEAPSIZE="1g" \
 ENV SCRIPTS_DIR="/scripts" \
     USER_ADDITION_SCRIPTS_DIR="/user_addition_scripts" \
     ROOT_ADDITION_SCRIPTS_DIR="/root_addition_scripts"
+
+ENV PATH="${HADOOP_HOME}/bin:${PATH}"
 
 ARG SU_EXEC_VERSION=0.2
 ARG SU_EXEC_URL="https://github.com/ncopa/su-exec/archive/v${SU_EXEC_VERSION}.tar.gz"
@@ -47,16 +49,16 @@ RUN apt-get update && apt-get -y install gcc make \
  && find "${HADOOP_HOME}/share/hadoop" -name "lib-examples" -type d -prune -exec rm -fr {} \; \
  && find "${HADOOP_HOME}/share/hadoop" -name "*-tests.jar" -type f -exec rm -f {} \; \
  && mv "${HADOOP_HOME}/etc" /hadoop_etc_orig \
- && mkdir -p "${HADOOP_CONFIG_TEMP_DIR}" "${SCRIPTS_DIR}" \
- && mkdir -p "${HADOOP_PID_DIR}" "${HADOOP_DATA_DIR}" "${HADOOP_CONFIG_DIR}" "${HADOOP_LOG_DIR}" \
+ && mkdir -p "${HADOOP_CONF_TEMP_DIR}" "${SCRIPTS_DIR}" \
+ && mkdir -p "${HADOOP_PID_DIR}" "${HADOOP_DATA_DIR}" "${HADOOP_CONF_DIR}" "${HADOOP_LOG_DIR}" \
  && chown -R "${HADOOP_USER}:${HADOOP_USER}" "${HADOOP_PID_DIR}" "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}" \
  && mkdir -p /scripts "${USER_ADDITION_SCRIPTS_DIR}" "${ROOT_ADDITION_SCRIPTS_DIR}" \
- && apt-get -y autoremove --purge gcc make \
+ && apt-get -y autoremove --purge gcc make curl \
  && apt-get -y clean \
  && rm -fr /var/lib/apt/lists/*
 
 ADD docker-entrypoint.sh "${SCRIPTS_DIR}"
-ADD core-site.xml.tmpl "${HADOOP_CONFIG_TEMP_DIR}"
+ADD core-site.xml.tmpl "${HADOOP_CONF_TEMP_DIR}"
 
 VOLUME "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}"
 
