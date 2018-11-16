@@ -25,7 +25,7 @@ ENV SCRIPTS_DIR="/scripts" \
     USER_ADDITION_SCRIPTS_DIR="/user_addition_scripts" \
     ROOT_ADDITION_SCRIPTS_DIR="/root_addition_scripts"
 
-ENV PATH="${HADOOP_HOME}/bin:${PATH}"
+ENV PATH="${PATH}:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin"
 
 ARG SU_EXEC_VERSION=0.2
 ARG SU_EXEC_URL="https://github.com/ncopa/su-exec/archive/v${SU_EXEC_VERSION}.tar.gz"
@@ -60,7 +60,7 @@ RUN apt-get update && apt-get -y install gcc make \
 ADD docker-entrypoint.sh "${SCRIPTS_DIR}"
 ADD core-site.xml.tmpl "${HADOOP_CONF_TEMP_DIR}"
 
-VOLUME "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}"
+VOLUME "${HADOOP_DATA_DIR}" "${HADOOP_LOG_DIR}" "${HADOOP_CONF_DIR}"
 
 WORKDIR "${HADOOP_HOME}"
 
