@@ -7,6 +7,8 @@ ARG HADOOP_DOWNLOAD_URL="https://www.apache.org/dyn/mirrors/mirrors.cgi?action=d
 ARG HADOOP_UID=1000
 ARG HADOOP_GID=1000
 
+ARG ACTIVATION_JAR_DOWNLOAD_URL="http://central.maven.org/maven2/javax/activation/activation/1.1/activation-1.1.jar"
+
 ENV HADOOP_HOME="/opt/hadoop" \
     HADOOP_PID_DIR="/var/run/hadoop" \
     HADOOP_LOG_DIR="/var/log/hadoop" \
@@ -48,6 +50,7 @@ RUN apt-get update && apt-get -y install gcc make \
  && find "${HADOOP_HOME}/share/hadoop" -name test -type d -prune -exec rm -fr {} \; \
  && find "${HADOOP_HOME}/share/hadoop" -name "lib-examples" -type d -prune -exec rm -fr {} \; \
  && find "${HADOOP_HOME}/share/hadoop" -name "*-tests.jar" -type f -exec rm -f {} \; \
+ && curl -L -o "${HADOOP_HOME}/share/hadoop/common/lib/activation-1.1.1.jar" "${ACTIVATION_JAR_DOWNLOAD_URL}" \
  && mv "${HADOOP_HOME}/etc" /hadoop_etc_orig \
  && mkdir -p "${HADOOP_CONF_TEMP_DIR}" "${SCRIPTS_DIR}" \
  && mkdir -p "${HADOOP_PID_DIR}" "${HADOOP_DATA_DIR}" "${HADOOP_CONF_DIR}" "${HADOOP_LOG_DIR}" \
