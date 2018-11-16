@@ -1,0 +1,65 @@
+version: '3'
+services:
+  namenode:
+    image: noodle05/hadoop-namenode:3.1.1
+    environment:
+      - HADOOP_NAMENODE_URI=hdfs://namenode
+    volumes:
+      - namenode-etc:/etc/hadoop
+    ports:
+      - 9870:9870
+      - 8020:8020
+    networks:
+      hadoop-net:
+        aliases:
+          - namenode
+    hostname: namenode
+  datanode1:
+    image: noodle05/hadoop-datanode:3.1.1
+    environment:
+      - HADOOP_NAMENODE_URI=hdfs://namenode
+      - HADOOP_DATANODE_ADDRESS=0.0.0.0:9880
+    ports:
+      - 9880:9880
+    networks:
+      hadoop-net:
+        aliases:
+          - datanode1
+    hostname: datanode1
+    depends_on:
+      - namenode
+  datanode2:
+    image: noodle05/hadoop-datanode:3.1.1
+    environment:
+      - HADOOP_NAMENODE_URI=hdfs://namenode
+      - HADOOP_DATANODE_ADDRESS=0.0.0.0:9881
+    ports:
+      - 9881:9881
+    networks:
+      hadoop-net:
+        aliases:
+          - datanode2
+    hostname: datanode2
+    depends_on:
+      - namenode
+  datanode3:
+    image: noodle05/hadoop-datanode:3.1.1
+    environment:
+      - HADOOP_NAMENODE_URI=hdfs://namenode
+      - HADOOP_DATANODE_ADDRESS=0.0.0.0:9882
+    ports:
+      - 9882:9882
+    networks:
+      hadoop-net:
+        aliases:
+          - datanode3
+    hostname: datanode3
+    depends_on:
+      - namenode
+
+volumes:
+  namenode-etc:
+
+networks:
+  hadoop-net:
+    driver: bridge
