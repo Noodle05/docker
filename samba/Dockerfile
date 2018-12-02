@@ -1,5 +1,5 @@
 FROM arm64v8/alpine:3.8
-MAINTAINER Wei Gao <wei@gaofamily.org>
+LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
 ARG CONFIG_FILE="/etc/samba/smb.conf"
 
