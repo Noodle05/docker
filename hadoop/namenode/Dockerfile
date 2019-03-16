@@ -1,4 +1,4 @@
-FROM noodle05/hadoop-base:3.1.1
+FROM noodle05/hadoop-base:3.1.2
 
 ENV SECONDARY_NAMENODE=false
 

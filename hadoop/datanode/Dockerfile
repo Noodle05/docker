@@ -1,4 +1,4 @@
-FROM noodle05/hadoop-base:3.1.1
+FROM noodle05/hadoop-base:3.1.2
 
 ENV HADOOP_DATANODE_ADDRESS=0.0.0.0:9866
 

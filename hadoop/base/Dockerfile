@@ -1,6 +1,6 @@
-FROM openjdk:11.0.1-jre-sid
+FROM openjdk:11.0.2-jre
 
-ARG HADOOP_VERSION="3.1.1"
+ARG HADOOP_VERSION="3.1.2"
 ARG HADOOP_BASE="/opt"
 ARG HADOOP_FULLNAME="hadoop-${HADOOP_VERSION}"
 ARG HADOOP_DOWNLOAD_URL="https://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=hadoop/common/${HADOOP_FULLNAME}/${HADOOP_FULLNAME}.tar.gz"
