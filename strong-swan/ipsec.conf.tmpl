@@ -1,0 +1,28 @@
+config setup
+  charondebug="ike 1, knl 1, cfg 1"
+
+conn ikev2-vpn
+  auto=add
+  compress=no
+  type=tunnel
+  keyexchange=ikev2
+  fragmentation=yes
+  forceencaps=yes
+  ike=aes256-sha1-modp1024
+  esp=aes256-sha1
+  dpdaction=clear
+  dpddelay=30s
+  rekey=no
+  left=%any
+  leftid=@{{ .Env.VPN_DOMAIN }}
+  leftcert=certificate.pem
+  leftsendcert=always
+  leftsubnet=0.0.0.0/0
+  leftupdown=/etc/ipsec.d/firewall.updown
+  right=%any
+  rightid=%any
+  rightauth=eap-mschapv2
+  rightsourceip={{ .Env.CLIENT_IP }}
+  rightdns={{ .Env.DNS_SERVERS }}
+  rightsendcert=never
+  eap_identity=%identity
