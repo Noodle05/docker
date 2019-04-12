@@ -1,6 +1,23 @@
 #!/bin/bash
 
-set -x
+trap "exit" SIGHUP SIGINT SIGTERM
+
+if [ -z "$VPN_DOMAIN" ] ; then
+  echo "No vpn domain set, please fill -e 'VPN_DOMAIN=vpn.example.com'"
+  exit 1
+fi
+
+certbot_check() {
+  echo "* Starting certificate request script ..."
+
+  certbot renew --post-hook "ipsec rereadall"
+
+  echo "* Certificate request process finished for domain $VPN_DOMAIN"
+
+  echo "* Next check in 12 hours"
+  sleep 12h
+  certbot_check
+}
 
 sysctl -w net.ipv4.ip_forward=1
 sysctl -w net.ipv4.conf.all.accept_redirects=0
@@ -19,4 +36,6 @@ ln -s /etc/letsencrypt/live/${VPN_DOMAIN}/chain.pem /etc/ipsec.d/cacerts/ca.pem
 ln -s /etc/letsencrypt/live/${VPN_DOMAIN}/cert.pem /etc/ipsec.d/certs/certificate.pem
 ln -s /etc/letsencrypt/live/${VPN_DOMAIN}/privkey.pem /etc/ipsec.d/private/key.pem
 
-ipsec start --nofork
+ipsec start
+
+certbot_check
