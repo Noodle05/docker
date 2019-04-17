@@ -1,4 +1,4 @@
-FROM arm64v8/alpine:3.8
+FROM alpine:3.9
 LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
 ARG CONFIG_FILE="/etc/samba/smb.conf"

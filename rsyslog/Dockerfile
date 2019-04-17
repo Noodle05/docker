@@ -1,4 +1,4 @@
-FROM arm64v8/alpine:3.8
+FROM alpine:3.9
 
 RUN apk --no-cache add rsyslog \
  && rm /etc/rsyslog.conf \

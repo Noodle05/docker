@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.9
 LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
 RUN apk --no-cache --no-progress add avahi \
