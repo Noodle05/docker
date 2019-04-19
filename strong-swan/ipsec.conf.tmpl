@@ -17,7 +17,7 @@ conn ikev2-vpn
   leftid=@{{ .Env.VPN_DOMAIN }}
   leftcert=certificate.pem
   leftsendcert=always
-  leftsubnet=0.0.0.0/0
+  leftsubnet={{ .Env.LEFT_SUBNET }}
   leftupdown=/etc/ipsec.d/firewall.updown
   right=%any
   rightid=%any

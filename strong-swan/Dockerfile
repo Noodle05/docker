@@ -3,6 +3,7 @@ FROM debian:stretch-slim
 ENV VPN_DOMAIN="vpn.example.com"
 ENV VPN_USER="test"
 ENV VPN_PASSWD="MySecuredPassword"
+ENV LEFT_SUBNET="0.0.0.0/0"
 ENV CLIENT_IP="192.168.12.0/24,fdef:a51d:f888::/112"
 ENV DNS_SERVERS="8.8.8.8,2001:4860:4860::8888"
 ARG ARCH="amd64"
