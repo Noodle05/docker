@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.10
 LABEL maintainer "Wei Gao <wei@gaofamily.org>"
 
 # Install packages
