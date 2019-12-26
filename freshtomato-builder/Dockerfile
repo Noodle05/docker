@@ -16,7 +16,7 @@ RUN apt-get update \
                texinfo dos2unix xsltproc libnfnetlink0 \
                libcurl4-openssl-dev libgtk2.0-dev libnotify-dev \
                libevent-dev mc git re2c texlive libelf1 mc \
-               linux-headers-4.9.0-11-amd64 \
+               linux-headers-4.9.0-11 \
  && DEBIAN_FRONTEND='noninteractive' apt-get remove -y --no-install-recommends libicu-dev \
  && dpkg --add-architecture i386 \
  && apt-get update \
