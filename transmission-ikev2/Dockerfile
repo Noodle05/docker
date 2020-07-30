@@ -1,12 +1,11 @@
-FROM alpine:3.10
+FROM alpine:3.12
 
 VOLUME /data
 VOLUME /config
 
 ARG DOCKERIZE_ARCH=armhf
 ENV DOCKERIZE_VERSION=v0.6.1
-RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-    && apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq \
+RUN apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq \
     && echo "Install dockerize $DOCKERIZE_VERSION ($DOCKERIZE_ARCH)" \
     && wget -qO- https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-$DOCKERIZE_ARCH-$DOCKERIZE_VERSION.tar.gz | tar xz -C /usr/bin \
     && mkdir -p /opt/transmission-ui \
