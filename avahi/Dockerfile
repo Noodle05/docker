@@ -1,7 +1,8 @@
-FROM alpine:3.10
+FROM alpine:3.12
 LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
-RUN apk --no-cache --no-progress add avahi \
+RUN apk --no-cache --no-progress upgrade \
+ && apk --no-cache --no-progress add avahi \
  && sed -i 's/#enable-dbus=yes/enable-dbus=no/g' /etc/avahi/avahi-daemon.conf \
  && rm -f /etc/avahi/services/* \
  && rm -rf /tmp/*
