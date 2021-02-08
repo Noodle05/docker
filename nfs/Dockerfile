@@ -1,4 +1,4 @@
-ARG BUILD_FROM=alpine:3.12
+ARG BUILD_FROM=alpine:3.13
 
 FROM $BUILD_FROM
 
