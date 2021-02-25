@@ -1,11 +1,13 @@
-FROM alpine:3.12
+FROM alpine:3.13
 
 VOLUME /data
 VOLUME /config
 
 ARG DOCKERIZE_ARCH=armhf
 ENV DOCKERIZE_VERSION=v0.6.1
+ADD certs/ /usr/local/share/ca-certificates/
 RUN apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq \
+    && /usr/sbin/update-ca-certificates \
     && echo "Install dockerize $DOCKERIZE_VERSION ($DOCKERIZE_ARCH)" \
     && wget -qO- https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-$DOCKERIZE_ARCH-$DOCKERIZE_VERSION.tar.gz | tar xz -C /usr/bin \
     && mkdir -p /opt/transmission-ui \
