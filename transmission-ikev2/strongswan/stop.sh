@@ -1,3 +1,3 @@
 #!/bin/sh
-ipsec down windscribe
+ipsec down btvpn
 ipsec stop

@@ -1,23 +1,23 @@
 #!/bin/sh
 
-if [[ "${WINDSCRIBE_HOSTNAME}" == "**None**" ]] || [[ -z "${WINDSCRIBE_HOSTNAME-}" ]]; then
-  echo "Winscribe host not set. Exiting."
+if [[ "${VPN_HOSTNAME}" == "**None**" ]] || [[ -z "${VPN_HOSTNAME-}" ]]; then
+  echo "VPN host not set. Exiting."
   exit 1
 fi
 
-# add Windscribe user/pass
-if [[ "${WINDSCRIBE_USERNAME}" == "**None**" ]] || [[ "${WINDSCRIBE_PASSWD}" == "**None**" ]] ; then
-  if [[ ! -f /config/windscribe-credentials.txt ]] ; then
-    echo "Windscribe credentials not set. Exiting."
+# add vpn user/pass
+if [[ "${VPN_USERNAME}" == "**None**" ]] || [[ "${VPN_PASSWD}" == "**None**" ]] ; then
+  if [[ ! -f /config/vpn-credentials.txt ]] ; then
+    echo "VPN credentials not set. Exiting."
     exit 1
   fi
-  echo "Found existing Windscribe credentials..."
+  echo "Found existing VPN credentials..."
 else
-  echo "Setting Windscfribe credentials..."
+  echo "Setting VPN credentials..."
   mkdir -p /config
-  echo "${WINDSCRIBE_USERNAME}" > /config/windscribe-credentials.txt
-  echo "${WINDSCRIBE_PASSWD}" >> /config/windscribe-credentials.txt
-  chmod 600 /config/windscribe-credentials.txt
+  echo "${VPN_USERNAME}" > /config/vpn-credentials.txt
+  echo "${VPN_PASSWD}" >> /config/vpn-credentials.txt
+  chmod 600 /config/vpn-credentials.txt
 fi
 
 # add transmission credentials from env vars

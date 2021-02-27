@@ -1,13 +1,13 @@
-conn windscribe
+conn btvpn
     keyexchange=ikev2
     dpdaction=restart
     dpddelay=300s
-    eap_identity={{ .Env.WINDSCRIBE_USERNAME }}
+    eap_identity={{ .Env.VPN_USERNAME }}
     leftauth=eap-mschapv2
     left=%defaultroute
     leftsourceip=%config
     leftupdown=/etc/strongswan/strongswan-updown.sh
-    right={{ .Env.WINDSCRIBE_HOSTNAME }}
+    right={{ .Env.VPN_HOSTNAME }}
     rightauth=pubkey
     rightsubnet=0.0.0.0/0
     rightid=%any

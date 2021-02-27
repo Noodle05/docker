@@ -38,9 +38,9 @@ ADD transmission/ /etc/transmission/
 ADD strongswan/ /etc/strongswan/
 ADD strongswan.conf /etc/strongswan.conf
 
-ENV WINDSCRIBE_HOSTNAME=**None** \
-    WINDSCRIBE_USERNAME=**None** \
-    WINDSCRIBE_PASSWD=**None** \
+ENV VPN_HOSTNAME=**None** \
+    VPN_USERNAME=**None** \
+    VPN_PASSWD=**None** \
     GLOBAL_APPLY_PERMISSIONS=true \
     TRANSMISSION_ALT_SPEED_DOWN=50 \
     TRANSMISSION_ALT_SPEED_ENABLED=false \
