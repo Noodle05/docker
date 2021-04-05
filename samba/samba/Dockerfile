@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.13
 LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
 ARG CONFIG_FILE="/etc/samba/smb.conf"
