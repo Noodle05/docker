@@ -1,9 +1,6 @@
-ARG BUILD_FROM=alpine:3.13
+FROM --platform=${TARGETPLATFORM} alpine:3.13
 
-FROM $BUILD_FROM
-
-RUN apk --update --no-cache upgrade \
- && apk --update --no-cache add bash nfs-utils \
+RUN apk --no-cache add bash nfs-utils \
  && rm -v /etc/idmapd.conf /etc/exports \
  && mkdir -p /var/lib/nfs/rpc_pipefs \
  && mkdir -p /var/lib/nfs/v4recovery \
@@ -13,5 +10,5 @@ RUN apk --update --no-cache upgrade \
 EXPOSE 2049
 
 # setup entrypoint
-COPY ./entrypoint.sh /usr/local/bin
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+COPY ./entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,38 +1,54 @@
-FROM alpine:3.13
+FROM --platform=${TARGETPLATFORM} alpine:3.13
+
+ARG TARGETPLATFORM
+ARG DOCKERIZE_ARCH
+ARG DOCKERIZE_VERSION=v0.6.1
 
 VOLUME /data
 VOLUME /config
 
-ARG DOCKERIZE_ARCH=armhf
-ENV DOCKERIZE_VERSION=v0.6.1
 ADD certs/ /usr/local/share/ca-certificates/
-RUN apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq \
-    && /usr/sbin/update-ca-certificates \
-    && echo "Install dockerize $DOCKERIZE_VERSION ($DOCKERIZE_ARCH)" \
-    && wget -qO- https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-$DOCKERIZE_ARCH-$DOCKERIZE_VERSION.tar.gz | tar xz -C /usr/bin \
-    && mkdir -p /opt/transmission-ui \
-    && echo "Install Combustion" \
-    && wget -qO- https://github.com/Secretmapper/combustion/archive/release.tar.gz | tar xz -C /opt/transmission-ui \
-    && echo "Install kettu" \
-    && wget -qO- https://github.com/endor/kettu/archive/master.tar.gz | tar xz -C /opt/transmission-ui \
-    && mv /opt/transmission-ui/kettu-master /opt/transmission-ui/kettu \
-    && echo "Install Transmission-Web-Control" \
-    && mkdir /opt/transmission-ui/transmission-web-control \
-    && wget -qO- https://github.com/ronggang/twc-release/raw/master/src.tar.gz | tar xz -C /opt/transmission-ui/transmission-web-control \
-    && ln -s /usr/share/transmission/web/style /opt/transmission-ui/transmission-web-control \
-    && ln -s /usr/share/transmission/web/images /opt/transmission-ui/transmission-web-control \
-    && ln -s /usr/share/transmission/web/javascript /opt/transmission-ui/transmission-web-control \
-    && ln -s /usr/share/transmission/web/index.html /opt/transmission-ui/transmission-web-control/index.original.html \
-    && rmdir /etc/ipsec.d/cacerts \
-    && rm /etc/ipsec.conf \
-    && rm /etc/ipsec.secrets \
-    && rm /etc/strongswan.conf \
-    && rm /etc/strongswan.d/charon/resolve.conf \
-    && ln -s /etc/ssl/certs /etc/ipsec.d/cacerts \
-    && rm -rf /tmp/* /var/tmp/* \
-    && groupmod -g 1000 users \
-    && useradd -u 911 -U -d /config -s /bin/false abc \
-    && usermod -G users abc
+RUN case ${TARGETPLATFORM} in \
+      "linux/amd64") \
+         DOCKERIZE_ARCH=alpine-linux-amd64 \
+         ;; \
+      "linux/arm64") \
+         DOCKERIZE_ARCH=linux-armhf \
+         ;; \
+      "linux/arm/v7") \
+         DOCKERIZE_ARCH=linux-armhf \
+         ;; \
+      "linux/386") \
+         DOCKERIZE_ARCH=linux-386 \
+         ;; \
+    esac \
+ && apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq \
+ && /usr/sbin/update-ca-certificates \
+ && echo "Install dockerize $DOCKERIZE_VERSION ($DOCKERIZE_ARCH)" \
+ && curl -fskL "https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-${DOCKERIZE_ARCH}-${DOCKERIZE_VERSION}.tar.gz" | tar xz -C /usr/bin \
+ && mkdir -p /opt/transmission-ui \
+ && echo "Install Combustion" \
+ && curl -fskL "https://github.com/Secretmapper/combustion/archive/release.tar.gz" | tar xz -C /opt/transmission-ui \
+ && echo "Install kettu" \
+ && curl -fskL "https://github.com/endor/kettu/archive/master.tar.gz" | tar xz -C /opt/transmission-ui \
+ && mv /opt/transmission-ui/kettu-master /opt/transmission-ui/kettu \
+ && echo "Install Transmission-Web-Control" \
+ && mkdir /opt/transmission-ui/transmission-web-control \
+ && curl -fskL https://github.com/ronggang/twc-release/raw/master/src.tar.gz | tar xz -C /opt/transmission-ui/transmission-web-control \
+ && ln -s /usr/share/transmission/web/style /opt/transmission-ui/transmission-web-control \
+ && ln -s /usr/share/transmission/web/images /opt/transmission-ui/transmission-web-control \
+ && ln -s /usr/share/transmission/web/javascript /opt/transmission-ui/transmission-web-control \
+ && ln -s /usr/share/transmission/web/index.html /opt/transmission-ui/transmission-web-control/index.original.html \
+ && rmdir /etc/ipsec.d/cacerts \
+ && rm /etc/ipsec.conf \
+ && rm /etc/ipsec.secrets \
+ && rm /etc/strongswan.conf \
+ && rm /etc/strongswan.d/charon/resolve.conf \
+ && ln -s /etc/ssl/certs /etc/ipsec.d/cacerts \
+ && rm -rf /tmp/* /var/tmp/* \
+ && groupmod -g 1000 users \
+ && useradd -u 911 -U -d /config -s /bin/false abc \
+ && usermod -G users abc
 
 ADD transmission/ /etc/transmission/
 ADD strongswan/ /etc/strongswan/
