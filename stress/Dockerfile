@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM --platform=${TARGETPLATFORM} alpine:3.13
 
 RUN apk --no-cache --no-progress add stress-ng
 ADD entrypoint.sh /
