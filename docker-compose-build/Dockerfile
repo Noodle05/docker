@@ -1,7 +1,7 @@
 FROM --platform=$TARGETPLATFORM python:3.9.4-buster  AS builder
 
 # docker-compose requires pyinstaller 4.1 (check github.com/docker/compose/requirements-build.txt)
-ARG VERSION=1.29.1
+ARG VERSION=1.29.2
 ARG PYINSTALLER_VER=4.3
 
 ENV LANG C.UTF-8
