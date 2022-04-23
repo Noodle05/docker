@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set +x
+
+rsstail -n 1 -q -r -g $GITEA_RSS | while read line
+do
+  version=$(echo $line | awk '{print $2}')
+  if [[ $version = "v*" ]]
+  then
+    version=$(echo $version | cut -c 2-)
+  fi
+  echo $version
+
+  git clone "${GITEA_STATIC_DOCKER_URL}"
+
+  docker buildx create --use --platform linux/amd64,linux/arm64,linux/arm/v7
+
+  login="false"
+  if [[ "$DOCKER_USER" != "" && "$DOCKER_PASSWD" != "" ]]
+  then
+    docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWD"
+    login="true"
+  fi
+
+  set +e
+
+  docker buildx build -t noodle05/gitea-static-init:$version -t noodle05/gitea-static-init:latest --build-arg GITEA_VERSION=v$version --platform linux/amd64,linux/arm64,linux/arm/v7 --push /work/gitea-static
+  result=$?
+
+  set -e
+
+  if [[ "$login" = "true" ]]
+  then
+    docker logout
+  fi
+
+  docker buildx rm
+  rm -fr /work/gitea-static
+
+  if [[ "$result" = "0" ]]
+  then
+    echo "Build and pushed successfully."
+  else
+    echo "Build and push failed."
+  fi
+done
