@@ -1,6 +1,6 @@
-FROM --platform=${TARGETPLATFORM} alpine:3.13
+FROM --platform=${TARGETPLATFORM} alpine:3.19
 
-RUN apk --no-cache add bash nfs-utils \
+RUN apk --no-cache add bash nfs-utils libcap \
  && rm -v /etc/idmapd.conf /etc/exports \
  && mkdir -p /var/lib/nfs/rpc_pipefs \
  && mkdir -p /var/lib/nfs/v4recovery \
