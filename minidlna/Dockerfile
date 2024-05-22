@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM} alpine:3.13
+FROM --platform=${TARGETPLATFORM} alpine:3.19
 LABEL maintainer "Wei Gao <wei@gaofamily.org>"
 
 # Install packages
