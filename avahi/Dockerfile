@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM} alpine:3.13
+FROM --platform=${TARGETPLATFORM} alpine:3.19
 LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
 RUN apk --no-cache --no-progress add avahi \
