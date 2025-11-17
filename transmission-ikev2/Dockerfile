@@ -1,31 +1,29 @@
-FROM --platform=${TARGETPLATFORM} alpine:3.19
+FROM --platform=${BUILDPLATFORM} golang:alpine3.22 AS builder
 
-ARG TARGETPLATFORM
-ARG DOCKERIZE_ARCH
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG TARGETOS
+ARG TARGETARCH
+ARG DOCKERIZE_VERSION=v0.9.7
+ARG DOCKERIZE_GIT_URL="https://github.com/jwilder/dockerize.git"
+
+RUN apk --no-cache add git make \
+ && mkdir /work \
+ && cd /work \
+ && git -c advice.detachedHead=false clone -b "${DOCKERIZE_VERSION}" --single-branch --depth 1 "${DOCKERIZE_GIT_URL}" \
+ && cd dockerize \
+ && go mod tidy \
+ && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o dockerize
+
+FROM alpine:3.22
 
 VOLUME /data
 VOLUME /config
 
 ADD certs/ /usr/local/share/ca-certificates/
-RUN case ${TARGETPLATFORM} in \
-      "linux/amd64") \
-         DOCKERIZE_ARCH=alpine-linux-amd64 \
-         ;; \
-      "linux/arm64") \
-         DOCKERIZE_ARCH=linux-armhf \
-         ;; \
-      "linux/arm/v7") \
-         DOCKERIZE_ARCH=linux-armhf \
-         ;; \
-      "linux/386") \
-         DOCKERIZE_ARCH=linux-386 \
-         ;; \
-    esac \
- && apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq \
+
+COPY --from=builder /work/dockerize/dockerize /usr/bin/dockerize
+
+RUN apk --no-cache add bash dumb-init strongswan shadow transmission-daemon transmission-cli curl jq ca-certificates \
  && /usr/sbin/update-ca-certificates \
- && echo "Install dockerize $DOCKERIZE_VERSION ($DOCKERIZE_ARCH)" \
- && curl -fskL "https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-${DOCKERIZE_ARCH}-${DOCKERIZE_VERSION}.tar.gz" | tar xz -C /usr/bin \
  && mkdir -p /opt/transmission-ui \
  && echo "Install Combustion" \
  && curl -fskL "https://github.com/Secretmapper/combustion/archive/release.tar.gz" | tar xz -C /opt/transmission-ui \

@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM} alpine:3.19
+FROM alpine:3.22
 LABEL maintainer="Wei Gao <wei@gaofamily.org>"
 
 ARG CONFIG_FILE="/etc/samba/smb.conf"
